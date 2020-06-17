@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">StudyWhereAh</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="google_maps_api_key">AIzaSyD71WLYAtXM7U5KT7BvGX7SrqGxaUfk2nM</string>
+
+    <string name="get_place">Get Place!</string>
+    <string name="max_travel_time">Max Travel Time</string>
+    <string name="food_available">Food available</string>
+    <string name="charging_ports">Charging Ports</string>
+    <string name="crowdedness">Crowdedness</string>
+
+    <string-array name="timing_arrays">
+        <item>30 mins</item>
+        <item>1 hour</item>
+        <item>1.5 hours</item>
+        <item>2 hours</item>
+    </string-array>
+
+    <string-array name="crowd_arrays">
+        <item>LOW</item>
+        <item>MID</item>
+        <item>HIGH</item>
+
+    </string-array>
+
+</resources>

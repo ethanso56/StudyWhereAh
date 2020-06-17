@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ChoosePreferencesActivity">
+
+
+    <TextView
+        android:id="@+id/tv_choose_your_preferences"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Your Preferences!"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:background="#808080"
+        android:padding="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ll_preferences"
+        />
+
+    <LinearLayout
+        android:id="@+id/ll_preferences"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_choose_your_preferences">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#D3D3D3"
+                android:padding="10dp"
+                android:text="@string/max_travel_time"
+                android:textSize="25sp"
+                tools:layout_editor_absoluteX="32dp"
+                tools:layout_editor_absoluteY="143dp" />
+
+
+            <Spinner
+                android:id="@+id/spinner_timing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:entries="@array/timing_arrays"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#D3D3D3"
+                android:padding="10dp"
+                android:text="@string/crowdedness"
+                android:textSize="25sp"
+                tools:layout_editor_absoluteX="32dp"
+                tools:layout_editor_absoluteY="143dp" />
+
+
+            <Spinner
+                android:id="@+id/crowd_timing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="33dp"
+                android:paddingLeft="30dp"
+                android:entries="@array/crowd_arrays"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#D3D3D3"
+                android:padding="10dp"
+                android:text="@string/charging_ports"
+                android:textSize="25sp"
+                tools:layout_editor_absoluteX="32dp"
+                tools:layout_editor_absoluteY="143dp" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#D3D3D3"
+                android:padding="10dp"
+                android:text="@string/food_available"
+                android:textSize="25sp"
+                tools:layout_editor_absoluteX="32dp"
+                tools:layout_editor_absoluteY="143dp" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="75dp"/>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|bottom"
+        android:text="Search!"
+        android:textSize="30sp"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_preferences" />
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
