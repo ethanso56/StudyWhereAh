@@ -2,7 +2,7 @@
     <string name="app_name">StudyWhereAh</string>
     <string name="title_activity_maps">Map</string>
 
-    <string name="google_maps_api_key">AIzaSyD71WLYAtXM7U5KT7BvGX7SrqGxaUfk2nM</string>
+    <string name="google_maps_api_key">YOUR GOOGLE MAPS API KEY HERE</string>
 
     <string name="get_place">Get Place!</string>
     <string name="max_travel_time">Max Travel Time</string>
