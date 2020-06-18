@@ -1,16 +1,21 @@
 package com.example.studywhereah.activities
 
 import android.Manifest
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.studywhereah.R
@@ -26,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
@@ -43,6 +49,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var currentLatitude : Double = 0.0
     private var currentLongitude : Double = 0.0
+
+    // editText is a var referring to the searchbar element searchbar_edit_text
+//    private lateinit var editText: EditText
 
     companion object {
         private const val PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
@@ -64,23 +73,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
 
+        // Initialize places, we may need the places api key(diff from google maps android sdk api key
+        // for the string parameter
+//        Places.initialize(applicationContext, resources.getString(R.string.google_maps_api_key))
+
+        // Set EditText non focusable
+        searchbar_edit_text.isFocusable = false
+        searchbar_edit_text.setOnClickListener(object: View.OnClickListener {
+            public override fun onClick(v: View?) {
+                var fieldList: List<Place.Field> = listOf(Place.Field.ADDRESS,
+                    Place.Field.LAT_LNG,
+                    Place.Field.NAME)
+
+                var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
+                    .build(this@MapsActivity)
+
+                startActivityForResult(intent, 100)
+
+            }
+        })
+
         /**
          * got problem - press one key then will go down
          * can just copy from happy places app
          */
 
-        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+/*
+//        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+//        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+//
+//        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+//            override fun onPlaceSelected(place: Place) {
+//                Log.i("place", "Place: " + place.name + ", " + place.id);
+//            }
+//
+//            override fun onError(status: Status) {
+//                Log.i("place", "An error occurred: $status");
+//            }
+//        })
 
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                Log.i("place", "Place: " + place.name + ", " + place.id);
-            }
-
-            override fun onError(status: Status) {
-                Log.i("place", "An error occurred: $status");
-            }
-        })
+ */
 
         settleLocation()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -97,6 +129,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // overidding this function is apparently crucial
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
+            //When success
+            //Initialize place
+            var place = Autocomplete.getPlaceFromIntent(data!!)
+            //Set address on searchbar_edit_text
+            searchbar_edit_text.setText(place.address)
+            //We can get the locality name, lat and long from place.
+        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+            //When error initialize status
+            var status = Autocomplete.getStatusFromIntent(data!!)
+            Toast.makeText(applicationContext, status.statusMessage
+            , Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
     /**
