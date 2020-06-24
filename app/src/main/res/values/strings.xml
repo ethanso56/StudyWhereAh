@@ -8,7 +8,7 @@
     <string name="max_travel_time">Max Travel Time</string>
     <string name="food_available">Food available</string>
     <string name="charging_ports">Charging Ports</string>
-    <string name="crowdedness">Crowdedness</string>
+    <string name="crowdLevel">Crowd Level</string>
 
     <string-array name="timing_arrays">
         <item>30 mins</item>

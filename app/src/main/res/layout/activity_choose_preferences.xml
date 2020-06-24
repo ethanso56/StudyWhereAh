@@ -50,10 +50,11 @@
 
 
             <Spinner
-                android:id="@+id/spinner_timing"
+                android:id="@+id/travel_timing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
                 android:entries="@array/timing_arrays"
                 />
 
@@ -73,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:background="#D3D3D3"
                 android:padding="10dp"
-                android:text="@string/crowdedness"
+                android:text="@string/crowdLevel"
                 android:textSize="25sp"
                 tools:layout_editor_absoluteX="32dp"
                 tools:layout_editor_absoluteY="143dp" />
@@ -83,8 +84,9 @@
                 android:id="@+id/crowd_timing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="33dp"
-                android:paddingLeft="30dp"
+                android:layout_marginStart="42dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="40dp"
                 android:entries="@array/crowd_arrays"
                 />
 
@@ -109,9 +111,12 @@
                 tools:layout_editor_absoluteY="143dp" />
 
             <CheckBox
+                android:id="@+id/checkbox_charging_ports"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="70dp"/>
+                android:layout_marginStart="70dp"
+                android:checked="true"
+                android:onClick="onCheckboxClicked"/>
 
         </LinearLayout>
 
@@ -134,9 +139,12 @@
                 tools:layout_editor_absoluteY="143dp" />
 
             <CheckBox
+                android:id="@+id/checkbox_food_available"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="75dp"/>
+                android:layout_marginStart="75dp"
+                android:checked="true"
+                android:onClick="onCheckboxClicked"/>
 
 
         </LinearLayout>

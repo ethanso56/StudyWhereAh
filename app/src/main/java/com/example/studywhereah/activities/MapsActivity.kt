@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.studywhereah.R
+import com.example.studywhereah.constants.Constants
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -74,11 +75,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
-                Log.i("place", "Place: " + place.name + ", " + place.id);
+                Log.i("place", "Place: " + place.name + ", " + place.id)
             }
 
             override fun onError(status: Status) {
-                Log.i("place", "An error occurred: $status");
+                Log.i("place", "An error occurred: $status")
             }
         })
 
@@ -91,8 +92,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         btn_get_place1.setOnClickListener {
             val intent = Intent(this, ChoosePreferencesActivity::class.java)
-            intent.putExtra("latitude", currentLatitude)
-            intent.putExtra("longitude", currentLongitude)
+            intent.putExtra(Constants.CURRENTLATITUDE, currentLatitude)
+            intent.putExtra(Constants.CURRENTLONGITUDE, currentLongitude)
             startActivity(intent)
         }
     }
