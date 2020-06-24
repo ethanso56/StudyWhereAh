@@ -8,6 +8,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -16,10 +17,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.LocationDetailsActivity"
+        <activity
+            android:name=".activities.LocationDetailsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CustomNoActionBarTheme"></activity>
-        <activity android:name=".activities.LocationsRecommendedActivity"
+        <activity
+            android:name=".activities.LocationsRecommendedActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CustomNoActionBarTheme"/>
         <activity
@@ -36,7 +39,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_api_key" />
 
         <activity
             android:name=".activities.MapsActivity"
