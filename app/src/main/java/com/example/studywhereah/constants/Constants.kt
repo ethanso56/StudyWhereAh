@@ -15,6 +15,8 @@ class Constants {
     companion object {
         const val CURRENTLATITUDE: String = "current_latitude"
         const val CURRENTLONGITUDE: String = "current_longitude"
+        const val SELECTEDLATITUDE : String = "selected_location_latitude"
+        const val SELECTEDLONGITUDE : String = "selected_location_longitude"
         const val NAMEOFLOCATION: String = "name_of_location"
         const val LATITUDEOFLOCATION: String = "latitude_of_location"
         const val LONGITUDEOFLOCATION: String = "longitude_of_location"

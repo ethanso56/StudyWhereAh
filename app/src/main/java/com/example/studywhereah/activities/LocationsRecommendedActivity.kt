@@ -15,6 +15,8 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     var currentLatitude : Double = 0.0
     var currentLongitude : Double = 0.0
+    var selectedLatitude : Double = 0.0
+    var selectedLongitude : Double = 0.0
     var locationsList = Constants.getLocationList()
     var maxTravelTime : Int = 0
     var crowdLevel : Int = 0
@@ -42,6 +44,8 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
         currentLatitude = intent.getDoubleExtra(Constants.CURRENTLATITUDE, 0.0)
         currentLongitude = intent.getDoubleExtra(Constants.CURRENTLONGITUDE, 0.0)
+        selectedLatitude = intent.getDoubleExtra(Constants.SELECTEDLATITUDE, 0.0)
+        selectedLongitude = intent.getDoubleExtra(Constants.SELECTEDLONGITUDE, 0.0)
 
         maxTravelTime = intent.getIntExtra(Constants.MAXTRAVELTIME, 0)
         crowdLevel = intent.getIntExtra(Constants.CROWDLEVEL, 0)
@@ -102,10 +106,14 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     }
 
+    private fun isCurrentLocation() : Boolean {
+        return !(selectedLatitude > 0 || selectedLongitude > 0)
+    }
+
     private fun calculateDistanceToLocation(locationLatitude: Double, locationLongitude: Double) : Double{
         val radiusOfEarth = 6371
-        val dLat = degToRad(currentLatitude - locationLatitude)
-        val dLon = degToRad(currentLongitude - locationLongitude)
+        val dLat = degToRad((if (isCurrentLocation()) currentLatitude else selectedLatitude) - locationLatitude)
+        val dLon = degToRad((if (isCurrentLocation()) currentLongitude else selectedLongitude) - locationLongitude)
         val a = sin(dLat / 2) * sin(dLat / 2) + cos(degToRad(locationLatitude)) * cos(degToRad(currentLatitude)) *
                 sin(dLon / 2) * sin(dLon / 2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))

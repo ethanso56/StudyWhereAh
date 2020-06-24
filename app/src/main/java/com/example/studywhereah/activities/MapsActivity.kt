@@ -50,28 +50,14 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var currentLatitude : Double = 0.0
     private var currentLongitude : Double = 0.0
 
-    // editText is a var referring to the searchbar element searchbar_edit_text
-//    private lateinit var editText: EditText
-
-//    companion object {
-//        private const val PLACE_AUTOCOMPLETE_REQUEST_CODE = 1
-//    }
-
+    private var selectedLatitude : Double = -1.0
+    private var selectedLongitude : Double = -1.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-//        var COUNTRIES = arrayOf("Singapore", "I DONT KNOW", "YKNOW")
-
-        //AutoCompleteTextView irrelevant for now
-//        var adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-//        COUNTRIES)
-//        actv_searchBar.setAdapter(adapter)
-//        actv_searchBar.setOnItemClickListener(object: AdapterView.OnItemClickListener {
-//
-//        })
 
         /**
          * Initialize the places sdk if it is not initialized earlier using the api key.
@@ -83,121 +69,41 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             )
         }
 
-        // Initialize places, we may need the places api key(diff from google maps android sdk api key
+        // Initialize places, we may need the places api key (diff from google maps android sdk api key
         // for the string parameter
 
         // Set EditText non focusable, the code below is to initiate an autocomplete activity
         // when the searchbar is clicked on.
-        tv_search.setOnClickListener(object: View.OnClickListener {
-            public override fun onClick(v: View?) {
-                var fieldList: List<Place.Field> = listOf(Place.Field.ADDRESS,
-                    Place.Field.LAT_LNG,
-                    Place.Field.NAME)
+        tv_search.setOnClickListener {
+            var fieldList: List<Place.Field> = listOf(Place.Field.ADDRESS,
+                Place.Field.LAT_LNG,
+                Place.Field.NAME)
 
-                var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
-                    .setCountry("SG")
-                    .build(this@MapsActivity)
+            var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
+                .setCountry("SG")
+                .build(this@MapsActivity)
 
-                startActivityForResult(intent, 100)
+            startActivityForResult(intent, 100)
+        }
 
-            }
-        })
-
-        /**
-         * got problem - press one key then will go down
-         * can just copy from happy places app
-         */
-
-/*
-//        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
-//        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
-//
-//        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-//            override fun onPlaceSelected(place: Place) {
-//                Log.i("place", "Place: " + place.name + ", " + place.id);
-//            }
-//
-//            override fun onError(status: Status) {
-//                Log.i("place", "An error occurred: $status");
-//            }
-//        })
-
- */
-        // Code pertaining to Searchview
-
-//        sv_location.suggestionsAdapter
-//        //The code below enables an integrated searchbar that tallies with the geocoder database.
-//        sv_location.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-//
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                var location = sv_location.query.toString()
-//                lateinit var addressList: List<Address>
-//                if (location != null || !location.equals("")) {
-//                    var geocoder = Geocoder(this@MapsActivity)
-//                    try {
-//                        addressList = geocoder.getFromLocationName(location, 1)
-//                    } catch (e: IOException) {
-//                        e.printStackTrace()
-//                    }
-//                    var address = addressList.get(0)
-//                    var coordinates = LatLng(address.latitude, address.longitude)
-//                    mMap.addMarker(MarkerOptions().position(coordinates).title(location))
-//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10.0F))
-//                }
-//
-//                return false
-//
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                //this is where i add suggestions
-//
-//                var fieldList: List<Place.Field> = listOf(Place.Field.ADDRESS,
-//                    Place.Field.LAT_LNG,
-//                    Place.Field.NAME)
-//
-//                var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
-//                    .build(this@MapsActivity)
-//
-//                startActivityForResult(intent, 100)
-//                return false
-//            }
-//        })
         mapFragment.getMapAsync(this)
-
-
-//        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-//            override fun onPlaceSelected(place: Place) {
-//                Log.i("place", "Place: " + place.name + ", " + place.id)
-//            }
-//
-//            override fun onError(status: Status) {
-//                Log.i("place", "An error occurred: $status")
-//            }
-//        })
-//
-//        settleLocation()
-
-
-//        settleLocation()
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-//        val mapFragment = supportFragmentManager
-//                .findFragmentById(R.id.map) as SupportMapFragment
-//        mapFragment.getMapAsync(this)
-
 
         btn_get_place1.setOnClickListener {
             val intent = Intent(this, ChoosePreferencesActivity::class.java)
             intent.putExtra(Constants.CURRENTLATITUDE, currentLatitude)
             intent.putExtra(Constants.CURRENTLONGITUDE, currentLongitude)
+            if (selectedLatitude >= 0 || selectedLongitude >= 0) {
+                intent.putExtra(Constants.SELECTEDLATITUDE, selectedLatitude)
+                intent.putExtra(Constants.SELECTEDLONGITUDE, selectedLongitude)
+            }
             startActivity(intent)
         }
     }
 
-    private fun addPointToViewPort(newPoint: LatLng) {
-        mBounds.include(newPoint)
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds.build(), 13))
-    }
+//    private fun addPointToViewPort(newPoint: LatLng) {
+//        mBounds.include(newPoint)
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds.build(), 13))
+//    }
 
     // overidding this function is apparently crucial for Places Autocomplete
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -210,7 +116,9 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             mMap.addMarker(MarkerOptions().position(place.latLng!!)
                 .title(place.name + ", CHECK IT OUT!" ))
             //Set address on searchbar_edit_text
-            tv_search.setText(place.name)
+            tv_search.text = place.name
+            selectedLatitude = place.latLng!!.latitude
+            selectedLongitude = place.latLng!!.longitude
             //We can get the locality name, lat and long from place.
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             //When error initialize status
@@ -234,12 +142,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mMap = googleMap
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
-        tv_search.viewTreeObserver.addOnGlobalLayoutListener(object:
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                mMap.setPadding(0, tv_search.height + 40, 0, 0)
-            }
-        })
+        tv_search.viewTreeObserver.addOnGlobalLayoutListener { mMap.setPadding(0, tv_search.height + 40, 0, 0) }
         mMap?.apply {settleLocation()}
 
     }

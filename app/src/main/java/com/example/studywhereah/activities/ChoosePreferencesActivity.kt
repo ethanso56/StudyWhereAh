@@ -3,17 +3,21 @@ package com.example.studywhereah.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.DropBoxManager
 import android.util.Log
 import android.view.View
 import android.widget.*
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
 import kotlinx.android.synthetic.main.activity_choose_preferences.*
+import java.nio.DoubleBuffer
 
 class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     var currentLatitude : Double = 0.0
     var currentLongitude : Double = 0.0
+    var selectedLatitude : Double = 0.0
+    var selectedLongitude : Double = 0.0
     var maxTravelTime : Int = 0
     var crowdLevel : Int = 0
     var foodAvailable : Boolean = true
@@ -26,6 +30,8 @@ class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelecte
 
         currentLatitude = intent.getDoubleExtra(Constants.CURRENTLATITUDE, 0.0)
         currentLongitude = intent.getDoubleExtra(Constants.CURRENTLONGITUDE, 0.0)
+        selectedLatitude = intent.getDoubleExtra(Constants.SELECTEDLATITUDE, 0.0)
+        selectedLongitude = intent.getDoubleExtra(Constants.SELECTEDLONGITUDE, 0.0)
 
         // set up travel timing spinner
         ArrayAdapter.createFromResource(
@@ -53,6 +59,8 @@ class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelecte
             val intent = Intent(this, LocationsRecommendedActivity::class.java)
             intent.putExtra(Constants.CURRENTLATITUDE, currentLatitude)
             intent.putExtra(Constants.CURRENTLONGITUDE, currentLongitude)
+            intent.putExtra(Constants.SELECTEDLATITUDE, selectedLatitude)
+            intent.putExtra(Constants.SELECTEDLONGITUDE, selectedLongitude)
             intent.putExtra(Constants.MAXTRAVELTIME, maxTravelTime)
             intent.putExtra(Constants.CROWDLEVEL, crowdLevel)
             intent.putExtra(Constants.FOODAVAILABLE, foodAvailable)
