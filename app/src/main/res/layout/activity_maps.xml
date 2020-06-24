@@ -20,30 +20,8 @@
 <!--        />-->
 
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
 
-            <EditText
-                android:id="@+id/searchbar_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Search"
-                android:padding="16dp"
-                android:drawablePadding="16dp"
-                android:drawableLeft="@drawable/ic_location"
-                android:background="@android:color/white"
-                android:gravity="center_vertical"/>
-
-    </androidx.cardview.widget.CardView>
-
-    <Button
-        android:id="@+id/btn_get_place1"
-        android:layout_width="149dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:text="Get Place!" />
+    
 
     <fragment
         android:id="@+id/map"
@@ -51,6 +29,54 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activities.MapsActivity" />
+    
+    <Button
+        android:id="@+id/btn_get_place1"
+        android:layout_width="149dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="Get Place!" />
+    
+<!--    <SearchView-->
+<!--        android:id="@+id/sv_location"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:queryHint="Search LAH!!"-->
+<!--        android:iconifiedByDefault="false"-->
+<!--        android:layout_margin="10dp"-->
+<!--        android:elevation="5dp"-->
+<!--        android:background="@android:color/white"-->
+<!--        android:focusable="false"-->
+<!--        android:focusableInTouchMode="false"/>-->
+
+    <TextView
+        android:id="@+id/tv_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:textSize="20dp"
+        android:layout_margin="15dp"
+        android:padding="16dp"
+        android:drawablePadding="16dp"
+        android:drawableLeft="@drawable/ic_location"
+        android:background="@drawable/searchbar_background"
+        android:elevation="5dp"
+        android:focusable="false"/>
+
+<!--    <AutoCompleteTextView-->
+<!--        android:id="@+id/actv_searchBar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Search"-->
+<!--        android:layout_margin="15dp"-->
+<!--        android:paddingLeft="25dp"-->
+<!--        android:paddingTop="9dp"-->
+<!--        android:paddingBottom="10dp"-->
+<!--        android:elevation="5dp"-->
+<!--        android:background="@drawable/searchbar_background"-->
+<!--        android:cursorVisible="false"-->
+<!--        android:inputType="text"-->
+<!--        android:maxLines="1"/>-->
 
 
 </FrameLayout>
