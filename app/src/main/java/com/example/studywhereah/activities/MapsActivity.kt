@@ -112,13 +112,23 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             //When success
             //Initialize place
             var place = Autocomplete.getPlaceFromIntent(data!!)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.latLng, 15.0f))
-            mMap.addMarker(MarkerOptions().position(place.latLng!!)
-                .title(place.name + ", CHECK IT OUT!" ))
+            var placeLatLng = place.latLng!!
+            var placeName = place.name!!
+            var rating = place.rating!!
+            var openingHours = place.openingHours!!
+            var userRatingsTotal = place.userRatingsTotal!!
+            var phoneNumber = place.phoneNumber!!
+
+            val intent = Intent(this, LocationDetailsActivity::class.java)
+
+
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, 15.0f))
+//            mMap.addMarker(MarkerOptions().position(place.latLng!!)
+//                .title(place.name + ", CHECK IT OUT!" ))
             //Set address on searchbar_edit_text
             tv_search.text = place.name
-            selectedLatitude = place.latLng!!.latitude
-            selectedLongitude = place.latLng!!.longitude
+            selectedLatitude = placeLatLng.latitude
+            selectedLongitude = placeLatLng.longitude
             //We can get the locality name, lat and long from place.
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             //When error initialize status

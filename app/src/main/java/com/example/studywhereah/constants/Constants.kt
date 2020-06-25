@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.studywhereah.R
 import com.example.studywhereah.models.LocationModel
+import com.google.android.libraries.places.api.model.OpeningHours
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -13,6 +14,7 @@ class Constants {
 
 
     companion object {
+        //the following const vals are keys to access values passed on by intents via the putExtra() methods
         const val CURRENTLATITUDE: String = "current_latitude"
         const val CURRENTLONGITUDE: String = "current_longitude"
         const val SELECTEDLATITUDE : String = "selected_location_latitude"
@@ -26,6 +28,10 @@ class Constants {
         const val CROWDLEVEL : String = "crowd_level"
         const val FOODAVAILABLE: String = "food_available"
         const val CHARGINGPORTS: String = "charging_ports"
+        const val RATING: String = "location_rating"
+        const val OPENINGHOURS: String = "location_opening_hours"
+        const val USERRATINGSTOTAL: String = "location_user_rating_total"
+        const val PHONENUMBER: String = "location_phone_number"
 
         @RequiresApi(Build.VERSION_CODES.O)
         val currentTime: LocalDateTime = LocalDateTime.now()

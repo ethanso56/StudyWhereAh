@@ -20,7 +20,7 @@
         <activity
             android:name=".activities.LocationDetailsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomNoActionBarTheme"></activity>
+            android:theme="@style/CustomNoActionBarTheme"/>
         <activity
             android:name=".activities.LocationsRecommendedActivity"
             android:screenOrientation="portrait"

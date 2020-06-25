@@ -134,7 +134,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     private fun setUpLocationOneView() {
         tv_location1Title.text = sortedLocationsList[0].getName()
-        iv_location1.setImageResource(sortedLocationsList[0].getImage1())
+//        iv_location1.setImageResource(sortedLocationsList[0].getImage1())
         tv_location1Address.text = "• Address: " + sortedLocationsList[0].getAddress()
         tv_phoneNum1.text = "• Phone number: " + sortedLocationsList[0].getPhoneNum().toString()
         tv_operatingHours1.text = "• Operating hours: " + sortedLocationsList[0].getOperatingHours()
@@ -143,7 +143,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     private fun setUpLocationTwoView() {
         tv_location2Title.text = sortedLocationsList[1].getName()
-        iv_location2.setImageResource(sortedLocationsList[1].getImage1())
+//        iv_location2.setImageResource(sortedLocationsList[1].getImage1())
         tv_location2Address.text = "• Address: " + sortedLocationsList[1].getAddress()
         tv_phoneNum2.text = "• Phone number: " + sortedLocationsList[1].getPhoneNum().toString()
         tv_operatingHours2.text = "• Operating hours: " + sortedLocationsList[1].getOperatingHours()
