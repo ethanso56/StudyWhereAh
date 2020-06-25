@@ -1,17 +1,19 @@
 package com.example.studywhereah.models
 
 class LocationModel(
-    private val name : String,
-    private val address : String,
-    private val latitude : Double,
-    private val longitude : Double,
-    private var distanceToUser : Double,
-    private var image1 : Int,
-    private var image2 : Int,
-    private val phoneNum : Int,
-    private val operatingHours : String,
-    private val foodAvailable : Boolean,
-    private val chargingPorts : Boolean) {
+    private val name: String,
+    private val address: String,
+    private val latitude: Double,
+    private val longitude: Double,
+    private var distanceToUser: Double,
+    private var image1: Int,
+    private var image2: Int,
+    private val phoneNum: Int,
+    private val operatingHours: String,
+    private val foodAvailable: Boolean,
+    private val chargingPorts: Boolean,
+    private val crowdLevel: Int
+) {
 
     fun getName() : String {
         return name
@@ -53,6 +55,17 @@ class LocationModel(
         return operatingHours
     }
 
+    fun getFoodAvailable() : Boolean {
+        return foodAvailable
+    }
+
+    fun getChargingPorts() : Boolean {
+        return chargingPorts
+    }
+
+    fun getCrowdLevel() : Int {
+        return crowdLevel
+    }
 
 }
 

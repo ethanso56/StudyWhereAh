@@ -1,8 +1,10 @@
 package com.example.studywhereah.activities
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.LocationModel
@@ -13,10 +15,17 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     var currentLatitude : Double = 0.0
     var currentLongitude : Double = 0.0
+    var selectedLatitude : Double = 0.0
+    var selectedLongitude : Double = 0.0
     var locationsList = Constants.getLocationList()
+    var maxTravelTime : Int = 0
+    var crowdLevel : Int = 0
+    var foodAvailable : Boolean = true
+    var chargingPorts : Boolean = true
     private lateinit var sortedLocationsList : ArrayList<LocationModel>
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_locations_recommended)
@@ -35,8 +44,42 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
         currentLatitude = intent.getDoubleExtra(Constants.CURRENTLATITUDE, 0.0)
         currentLongitude = intent.getDoubleExtra(Constants.CURRENTLONGITUDE, 0.0)
+        selectedLatitude = intent.getDoubleExtra(Constants.SELECTEDLATITUDE, 0.0)
+        selectedLongitude = intent.getDoubleExtra(Constants.SELECTEDLONGITUDE, 0.0)
+
+        maxTravelTime = intent.getIntExtra(Constants.MAXTRAVELTIME, 0)
+        crowdLevel = intent.getIntExtra(Constants.CROWDLEVEL, 0)
+        foodAvailable = intent.getBooleanExtra(Constants.FOODAVAILABLE, true)
+        chargingPorts = intent.getBooleanExtra(Constants.CHARGINGPORTS, true)
+
+        if (foodAvailable) {
+            locationsList.removeIf { !it.getFoodAvailable() }
+        }
+        if (chargingPorts) {
+            locationsList.removeIf { !it.getChargingPorts() }
+        }
 
         calculateDistanceAndSetPropertyForAllLocations(locationsList)
+
+        if (maxTravelTime == 0) {
+            // remove all locations > 4km
+            locationsList.removeIf { it.getDistanceToUser() > 4 }
+        } else if (maxTravelTime == 1) {
+            // remove all locations > 8km
+            locationsList.removeIf { it.getDistanceToUser() > 8 }
+        } else if (maxTravelTime == 2) {
+            // remove all locations > 12km
+            locationsList.removeIf { it.getDistanceToUser() > 12 }
+        }
+
+        if (crowdLevel == 0) {
+            // remove all locations that have "mid" and "high" levels
+            locationsList.removeIf { it.getCrowdLevel() > 0 }
+        } else if (crowdLevel == 1) {
+            // remove all locations that have "high" levels
+            locationsList.removeIf { it.getCrowdLevel() > 1 }
+        }
+
         sortedLocationsList = ArrayList(locationsList.sortedWith(compareBy { it.getDistanceToUser() }))
         setUpLocationOneView()
         setUpLocationTwoView()
@@ -60,16 +103,21 @@ class LocationsRecommendedActivity : AppCompatActivity() {
             intent.putExtra(Constants.IMAGEOFLOCATION2, sortedLocationsList[1].getImage2())
             startActivity(intent)
         }
+
+    }
+
+    private fun isCurrentLocation() : Boolean {
+        return !(selectedLatitude > 0 || selectedLongitude > 0)
     }
 
     private fun calculateDistanceToLocation(locationLatitude: Double, locationLongitude: Double) : Double{
-        var radiusOfEarth = 6371
-        var dLat = degToRad(currentLatitude - locationLatitude)
-        var dLon = degToRad(currentLongitude - locationLongitude)
-        var a = sin(dLat / 2) * sin(dLat / 2) + cos(degToRad(locationLatitude)) * cos(degToRad(currentLatitude)) *
+        val radiusOfEarth = 6371
+        val dLat = degToRad((if (isCurrentLocation()) currentLatitude else selectedLatitude) - locationLatitude)
+        val dLon = degToRad((if (isCurrentLocation()) currentLongitude else selectedLongitude) - locationLongitude)
+        val a = sin(dLat / 2) * sin(dLat / 2) + cos(degToRad(locationLatitude)) * cos(degToRad(currentLatitude)) *
                 sin(dLon / 2) * sin(dLon / 2)
-        var c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        var d = radiusOfEarth * c
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        val d = radiusOfEarth * c
         return d
     }
 
