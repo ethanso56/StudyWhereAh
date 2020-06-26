@@ -72,7 +72,13 @@
 
                 <TextView
                     android:id="@+id/tv_location_detail_rating"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    />
+                <TextView
+                    android:id="@+id/tv_location_ratings_total"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="20sp"
                     />

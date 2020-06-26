@@ -12,8 +12,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
+import androidx.core.view.marginTop
 import androidx.fragment.app.FragmentActivity
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
@@ -34,6 +37,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -52,6 +56,21 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     private var selectedLatitude : Double = -1.0
     private var selectedLongitude : Double = -1.0
+
+    private var nameOfLocation = ""
+    private var latitudeOfLocation = 0.0
+    private var longitudeOfLocation = 0.0
+    private var rating: Double? = 0.0
+//    private lateinit var openingHours: OpeningHours
+    private var userRatingsTotal: Int? = 0
+    private var phoneNumber: String? = ""
+    private var imageOfLocation1 = -1
+    private var imageOfLocation2 = -1
+
+    private var curatedLocationList = Constants.getLocationList()
+
+    //For the slide up panel
+    private lateinit var bsb: BottomSheetBehavior<LinearLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +107,40 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
 
+        //Enable the LinearLayout to work like a slide up panel
+        ll_location_details.setVisibility(View.INVISIBLE)
+        ll_button_row.bringToFront()
+        bsb = BottomSheetBehavior.from(ll_location_details)
+        bsb.setPeekHeight(700, true)
+
+
+        ll_location_details.setOnClickListener (object: View.OnClickListener {
+            override fun onClick(v: View?) {
+                if (bsb.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bsb.state = BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    bsb.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
+        }
+        )
+
+        //button to toggle the overlay panel.
+        btn_toggle_info.setOnClickListener(object: View.OnClickListener{
+            override fun onClick(v: View?) {
+                if (tv_search.text != "Search") {
+                    if (ll_location_details.isVisible) {
+                        //should tv_search be ll_button_row instead?
+                        ll_location_details.setVisibility(View.INVISIBLE)
+                    } else {
+                        //need to add the feature of re centering the map when the info window is up.
+                        ll_location_details.setVisibility(View.VISIBLE)
+                    }
+                }
+
+            }
+        })
+
         btn_get_place1.setOnClickListener {
             val intent = Intent(this, ChoosePreferencesActivity::class.java)
             intent.putExtra(Constants.CURRENTLATITUDE, currentLatitude)
@@ -97,6 +150,13 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
                 intent.putExtra(Constants.SELECTEDLONGITUDE, selectedLongitude)
             }
             startActivity(intent)
+        }
+
+        btn_navigate_here.setOnClickListener {
+            val gmmIntentUri: Uri = Uri.parse("google.navigation:q=$latitudeOfLocation, $longitudeOfLocation")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            startActivity(mapIntent)
         }
     }
 
@@ -112,19 +172,44 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             //When success
             //Initialize place
             var place = Autocomplete.getPlaceFromIntent(data!!)
-            var placeLatLng = place.latLng!!
-            var placeName = place.name!!
-            var rating = place.rating!!
-            var openingHours = place.openingHours!!
-            var userRatingsTotal = place.userRatingsTotal!!
-            var phoneNumber = place.phoneNumber!!
+            var placeLatLng = place.latLng
+            latitudeOfLocation = placeLatLng!!.latitude
+            longitudeOfLocation = placeLatLng!!.longitude
+            nameOfLocation = place.name!!
+            rating = place.rating
+//            openingHours = place.openingHours
+            userRatingsTotal = place.userRatingsTotal
+            phoneNumber = place.phoneNumber
+            // if the location exists in our database??
+//            if (latitudeOfLocation == )
+//            imageOfLocation1 = -1
+//            imageOfLocation2 = -1
 
-            val intent = Intent(this, LocationDetailsActivity::class.java)
+
+            ll_location_details.setVisibility(View.VISIBLE)
+            // set the TextViews to contain the results obtained from Google Places.
+            iv_location_detail1.setImageResource(curatedLocationList[0].getImage1())
+            iv_location_detail2.setImageResource(curatedLocationList[0].getImage2())
+            tv_location_detail_name.text = nameOfLocation
+            tv_location_detail_rating.text = rating.toString()
+            tv_location_ratings_total.text = userRatingsTotal.toString()
+            tv_location_type.text = "LIBRARY (hardcoded)"
+
+            tv_locationAddress.text = "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
 
 
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, 15.0f))
-//            mMap.addMarker(MarkerOptions().position(place.latLng!!)
-//                .title(place.name + ", CHECK IT OUT!" ))
+//            val intent = Intent(this, LocationDetailsActivity::class.java)
+//            intent.putExtra(Constants.LATITUDEOFLOCATION, placeLatLng.latitude)
+//            intent.putExtra(Constants.LONGITUDEOFLOCATION, placeLatLng.longitude)
+//            intent.putExtra(Constants.NAMEOFLOCATION, placeName)
+//            intent.putExtra(Constants.RATING, rating)
+////            intent.putExtra(Constants.OPENINGHOURS, openingHours)
+//            intent.putExtra(Constants.USERRATINGSTOTAL, userRatingsTotal)
+//            intent.putExtra(Constants.PHONENUMBER, phoneNumber)
+//            startActivity(intent)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng!!, 15.0f))
+            mMap.addMarker(MarkerOptions().position(placeLatLng!!)
+                .title(place.name + ", CHECK IT OUT!" ))
             //Set address on searchbar_edit_text
             tv_search.text = place.name
             selectedLatitude = placeLatLng.latitude
@@ -152,7 +237,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mMap = googleMap
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
-        tv_search.viewTreeObserver.addOnGlobalLayoutListener { mMap.setPadding(0, tv_search.height + 40, 0, 0) }
+        tv_search.viewTreeObserver.addOnGlobalLayoutListener { mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20) }
         mMap?.apply {settleLocation()}
 
     }
