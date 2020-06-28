@@ -122,11 +122,11 @@ class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelecte
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val spinner : Spinner = parent as Spinner
         if (spinner.id == R.id.travel_timing) {
-            maxTravelTime = position
-            Toast.makeText(this, "$position selected1", Toast.LENGTH_SHORT).show()
+            maxTravelTime = 100
+//            Toast.makeText(this, "$position selected1", Toast.LENGTH_SHORT).show()
         } else {
             crowdLevel = position
-            Toast.makeText(this, "$position selected2", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "$position selected2", Toast.LENGTH_SHORT).show()
         }
     }
 }
