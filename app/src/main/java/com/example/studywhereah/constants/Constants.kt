@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter
 
 class Constants {
 
-
     companion object {
         const val CURRENTLATITUDE: String = "current_latitude"
         const val CURRENTLONGITUDE: String = "current_longitude"
