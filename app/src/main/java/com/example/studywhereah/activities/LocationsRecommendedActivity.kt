@@ -85,22 +85,30 @@ class LocationsRecommendedActivity : AppCompatActivity() {
         setUpLocationTwoView()
 
         cv_location1.setOnClickListener {
-            val intent = Intent(this, LocationDetailsActivity::class.java)
+            val intent = Intent(this, MapsActivity::class.java)
             intent.putExtra(Constants.NAMEOFLOCATION, sortedLocationsList[0].getName())
             intent.putExtra(Constants.LATITUDEOFLOCATION, sortedLocationsList[0].getLatitude())
             intent.putExtra(Constants.LONGITUDEOFLOCATION, sortedLocationsList[0].getLongitude())
-            intent.putExtra(Constants.IMAGEOFLOCATION1, sortedLocationsList[0].getImage1())
-            intent.putExtra(Constants.IMAGEOFLOCATION2, sortedLocationsList[0].getImage2())
+            intent.putExtra(Constants.ADDRESSOFLOCATION, sortedLocationsList[1].getAddress())
+            intent.putExtra(Constants.IMAGESOFLOCATION, sortedLocationsList[0].getImages())
+            intent.putExtra(Constants.FOODAVAILABLE, sortedLocationsList[1].getFoodAvailable())
+            intent.putExtra(Constants.CHARGINGPORTS, sortedLocationsList[1].getChargingPorts())
+            //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
+            intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
             startActivity(intent)
         }
 
         cv_location2.setOnClickListener {
-            val intent = Intent(this, LocationDetailsActivity::class.java)
+            val intent = Intent(this, MapsActivity::class.java)
             intent.putExtra(Constants.NAMEOFLOCATION, sortedLocationsList[1].getName())
             intent.putExtra(Constants.LATITUDEOFLOCATION, sortedLocationsList[1].getLatitude())
             intent.putExtra(Constants.LONGITUDEOFLOCATION, sortedLocationsList[1].getLongitude())
-            intent.putExtra(Constants.IMAGEOFLOCATION1, sortedLocationsList[1].getImage1())
-            intent.putExtra(Constants.IMAGEOFLOCATION2, sortedLocationsList[1].getImage2())
+            intent.putExtra(Constants.ADDRESSOFLOCATION, sortedLocationsList[1].getAddress())
+            intent.putExtra(Constants.IMAGESOFLOCATION, sortedLocationsList[1].getImages())
+            intent.putExtra(Constants.FOODAVAILABLE, sortedLocationsList[1].getFoodAvailable())
+            intent.putExtra(Constants.CHARGINGPORTS, sortedLocationsList[1].getChargingPorts())
+            //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
+            intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
             startActivity(intent)
         }
 

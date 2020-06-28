@@ -56,8 +56,8 @@ class LocationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        rating = intent.getDoubleExtra(Constants.RATING, 0.0)
 //        userRatingsTotal = intent.getIntExtra(Constants.USERRATINGSTOTAL, 0)
 //        phoneNumber = intent.getStringExtra(Constants.PHONENUMBER)
-        imageOfLocation1 = intent.getIntExtra(Constants.IMAGEOFLOCATION1, -1)
-        imageOfLocation2 = intent.getIntExtra(Constants.IMAGEOFLOCATION2, -1)
+//        imageOfLocation1 = intent.getIntExtra(Constants.IMAGEOFLOCATION1, -1)
+//        imageOfLocation2 = intent.getIntExtra(Constants.IMAGEOFLOCATION2, -1)
 
         //Assigning passed data to textViews within the info window
         iv_location_detail1.setImageResource(imageOfLocation1)

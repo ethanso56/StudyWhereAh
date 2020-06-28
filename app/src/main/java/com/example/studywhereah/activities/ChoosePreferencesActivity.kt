@@ -123,10 +123,10 @@ class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelecte
         val spinner : Spinner = parent as Spinner
         if (spinner.id == R.id.travel_timing) {
             maxTravelTime = 100
-            Toast.makeText(this, "$position selected1", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "$position selected1", Toast.LENGTH_SHORT).show()
         } else {
             crowdLevel = position
-            Toast.makeText(this, "$position selected2", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "$position selected2", Toast.LENGTH_SHORT).show()
         }
     }
 }

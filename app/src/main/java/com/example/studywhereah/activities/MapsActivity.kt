@@ -44,7 +44,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_maps.*
 
-class MapsActivity : FragmentActivity(), OnMapReadyCallback {
+class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private var mBounds: LatLngBounds.Builder = LatLngBounds.Builder()
@@ -57,16 +57,18 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var selectedLatitude : Double = -1.0
     private var selectedLongitude : Double = -1.0
 
-    private var nameOfLocation = ""
-    private var latitudeOfLocation = 0.0
-    private var longitudeOfLocation = 0.0
-    private var rating: Double? = 0.0
+    private var nameOfLocation: String? = null
+    private var latitudeOfLocation: Double? = null
+    private var longitudeOfLocation: Double? = null
+    private var addressOfLocation: String? = null
+    private var rating: Double? = null
 //    private lateinit var openingHours: OpeningHours
-    private var userRatingsTotal: Int? = 0
-    private var phoneNumber: String? = ""
-    private var imageOfLocation1 = -1
-    private var imageOfLocation2 = -1
+    private var userRatingsTotal: Int? = null
+    private var phoneNumber: String? = null
+    private var imagesOfLocation = ArrayList<Int>()
 
+    //An ArrayList of locations that exist in our database.
+    // maybe change it to a hashtable?
     private var curatedLocationList = Constants.getLocationList()
 
     //For the slide up panel
@@ -113,6 +115,50 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         bsb = BottomSheetBehavior.from(ll_location_details)
         bsb.setPeekHeight(700, true)
 
+        if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
+
+            nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
+            latitudeOfLocation = intent.getDoubleExtra(Constants.LATITUDEOFLOCATION, 0.0)
+            longitudeOfLocation = intent.getDoubleExtra(Constants.LONGITUDEOFLOCATION, 0.0)
+            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+
+
+//            mMap.animateCamera(
+//                CameraUpdateFactory.newLatLngZoom(
+//                    LatLng(
+//                        latitudeOfLocation!!,
+//                        longitudeOfLocation!!
+//                    ), 15.0f
+//                )
+//            )
+//            mMap.addMarker(
+//                MarkerOptions().position(
+//                    LatLng(
+//                        latitudeOfLocation!!,
+//                        longitudeOfLocation!!
+//                    )
+//                )
+//                    .title(nameOfLocation)
+//            )
+
+            //Set address on searchbar_edit_text
+            selectedLatitude = latitudeOfLocation as Double
+            selectedLongitude = longitudeOfLocation as Double
+            tv_search.text = nameOfLocation
+
+            ll_location_details.setVisibility(View.VISIBLE)
+            // set the TextViews to contain the results obtained from Google Places.
+
+            tv_location_detail_name.text = nameOfLocation
+            tv_location_detail_rating.text = rating.toString()
+            tv_location_ratings_total.text = userRatingsTotal.toString()
+            tv_location_type.text = "LIBRARY (hardcoded)"
+            iv_location_detail1.setImageResource(imagesOfLocation.get(0))
+            iv_location_detail2.setImageResource(imagesOfLocation.get(1))
+            tv_locationAddress.text =
+                "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
+
+        }
 
         ll_location_details.setOnClickListener (object: View.OnClickListener {
             override fun onClick(v: View?) {
@@ -173,45 +219,29 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             //Initialize place
             var place = Autocomplete.getPlaceFromIntent(data!!)
             var placeLatLng = place.latLng
-            latitudeOfLocation = placeLatLng!!.latitude
-            longitudeOfLocation = placeLatLng!!.longitude
-            nameOfLocation = place.name!!
+            latitudeOfLocation = placeLatLng?.latitude
+            longitudeOfLocation = placeLatLng?.longitude
+            addressOfLocation = place.address
+            nameOfLocation = place.name
             rating = place.rating
-//            openingHours = place.openingHours
             userRatingsTotal = place.userRatingsTotal
             phoneNumber = place.phoneNumber
-            // if the location exists in our database??
-//            if (latitudeOfLocation == )
-//            imageOfLocation1 = -1
-//            imageOfLocation2 = -1
-
 
             ll_location_details.setVisibility(View.VISIBLE)
             // set the TextViews to contain the results obtained from Google Places.
-            iv_location_detail1.setImageResource(curatedLocationList[0].getImage1())
-            iv_location_detail2.setImageResource(curatedLocationList[0].getImage2())
+            iv_location_detail1.setImageResource(curatedLocationList[1].getImages().get(0))
+            iv_location_detail2.setImageResource(curatedLocationList[1].getImages().get(1))
             tv_location_detail_name.text = nameOfLocation
             tv_location_detail_rating.text = rating.toString()
             tv_location_ratings_total.text = userRatingsTotal.toString()
             tv_location_type.text = "LIBRARY (hardcoded)"
-
             tv_locationAddress.text = "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
 
-
-//            val intent = Intent(this, LocationDetailsActivity::class.java)
-//            intent.putExtra(Constants.LATITUDEOFLOCATION, placeLatLng.latitude)
-//            intent.putExtra(Constants.LONGITUDEOFLOCATION, placeLatLng.longitude)
-//            intent.putExtra(Constants.NAMEOFLOCATION, placeName)
-//            intent.putExtra(Constants.RATING, rating)
-////            intent.putExtra(Constants.OPENINGHOURS, openingHours)
-//            intent.putExtra(Constants.USERRATINGSTOTAL, userRatingsTotal)
-//            intent.putExtra(Constants.PHONENUMBER, phoneNumber)
-//            startActivity(intent)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng!!, 15.0f))
             mMap.addMarker(MarkerOptions().position(placeLatLng!!)
-                .title(place.name + ", CHECK IT OUT!" ))
+                .title(nameOfLocation + ", CHECK IT OUT!" ))
             //Set address on searchbar_edit_text
-            tv_search.text = place.name
+//            tv_search.text = nameOfLocation
             selectedLatitude = placeLatLng.latitude
             selectedLongitude = placeLatLng.longitude
             //We can get the locality name, lat and long from place.
@@ -238,7 +268,22 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
         tv_search.viewTreeObserver.addOnGlobalLayoutListener { mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20) }
-        mMap?.apply {settleLocation()}
+
+        mMap.setOnMapLoadedCallback(this)
+        mMap?.apply {
+            settleLocation()
+            //the reason the code below is in onMapReady and not onCreate is because
+            //the map ahs to be initialized in order for the animate camera to work.
+            //Only if there is data passed from a previous activity
+        }
+    }
+
+    override fun onMapLoaded() {
+        if (latitudeOfLocation != null && longitudeOfLocation != null) {
+            val location = LatLng(latitudeOfLocation!!, longitudeOfLocation!!)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f))
+            mMap.addMarker(MarkerOptions().position(location))
+        }
 
     }
 
@@ -330,5 +375,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f))
 //        mMap.addMarker(MarkerOptions().position(location).title("Your current location"))
     }
+
+
 
 }

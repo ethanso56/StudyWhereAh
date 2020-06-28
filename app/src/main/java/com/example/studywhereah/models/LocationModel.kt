@@ -6,8 +6,7 @@ class LocationModel(
     private val latitude: Double,
     private val longitude: Double,
     private var distanceToUser: Double,
-    private var image1: Int,
-    private var image2: Int,
+    private var imageArrList: ArrayList<Int>,
     private val phoneNum: Int,
     private val operatingHours: String,
     private val foodAvailable: Boolean,
@@ -23,12 +22,8 @@ class LocationModel(
         return address
     }
 
-    fun getImage1() : Int {
-        return image1
-    }
-
-    fun getImage2() : Int {
-        return image2
+    fun getImages() : ArrayList<Int> {
+        return imageArrList
     }
 
     fun getLatitude() : Double {

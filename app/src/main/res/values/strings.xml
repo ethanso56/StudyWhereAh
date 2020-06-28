@@ -9,7 +9,7 @@
     <string name="food_available">Food available</string>
     <string name="charging_ports">Charging Ports</string>
     <string name="crowdLevel">Crowd Level</string>
-    <string name="toggle_info_button">Toggle\nInformation</string>
+    <string name="toggle_info_button">Toggle\nInfoPanelw</string>
 
     <string-array name="timing_arrays">
         <item>30 mins</item>

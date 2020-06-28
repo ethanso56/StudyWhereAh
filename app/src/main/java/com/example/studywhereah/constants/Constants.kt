@@ -1,5 +1,6 @@
 package com.example.studywhereah.constants
 
+import android.location.Location
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -9,6 +10,7 @@ import com.example.studywhereah.models.LocationModel
 import com.google.android.libraries.places.api.model.OpeningHours
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Arrays.asList
 
 class Constants {
 
@@ -22,8 +24,8 @@ class Constants {
         const val NAMEOFLOCATION: String = "name_of_location"
         const val LATITUDEOFLOCATION: String = "latitude_of_location"
         const val LONGITUDEOFLOCATION: String = "longitude_of_location"
-        const val IMAGEOFLOCATION1: String = "image_of_location1"
-        const val IMAGEOFLOCATION2: String = "image_of_location2"
+        const val ADDRESSOFLOCATION: String = "address_of_location"
+        const val IMAGESOFLOCATION: String = "images_of_location"
         const val MAXTRAVELTIME: String = "max_travel_time"
         const val CROWDLEVEL : String = "crowd_level"
         const val FOODAVAILABLE: String = "food_available"
@@ -58,19 +60,21 @@ class Constants {
 
         }
 
-
+        // Note that if the images are too big, the app can crash.
         fun getLocationList() : ArrayList<LocationModel> {
             Log.d("time", formatDateCurrentTime)
             val locationList = ArrayList<LocationModel>()
 
             val clementiLibrary = LocationModel(
-                "Clementi Library",
+                "Clementi Public Library",
                 "3155 Commonwealth Avenue West #05-13/14/15 The Clementi Mall, S129588",
                 1.314942,
                 103.764027,
                 0.0,
-                R.drawable.img_clementi_library1,
-                R.drawable.img_clementi_library2,
+                ArrayList(
+                    listOf(R.drawable.img_clementi_library1,
+                        R.drawable.img_clementi_library2)
+                ),
                 -1,
                 "10am to 9pm",
                 true,
@@ -80,13 +84,15 @@ class Constants {
             locationList.add(clementiLibrary)
 
             val bedokLibrary = LocationModel(
-                "Bedok Library",
+                "Bedok Public Library",
                 "11 Bedok North Street 1, #02-03 & #03-04, Heartbeat@Bedok, S469662",
                 1.327179,
                 103.931762,
                 0.0,
+                ArrayList(listOf(
                 R.drawable.img_bedok_library1,
-                R.drawable.img_bedok_library1,
+                R.drawable.img_bedok_library1)
+                ),
                 63323255,
                 "10am to 9pm",
                 true,
@@ -97,13 +103,14 @@ class Constants {
             locationList.add(bedokLibrary)
 
             val yishunLibrary = LocationModel(
-                "Yishun Library, ",
+                "Yishun Public Library",
                 "930 Yishun Ave 2, #04-01 North Wing, Northpoint City, S769098",
                 1.429656,
                 103.835770,
                 0.0,
-                R.drawable.img_yishun_library1,
-                R.drawable.img_yishun_library2,
+                ArrayList(listOf(R.drawable.img_yishun_library3,
+                    R.drawable.img_yishun_library2))
+                ,
                 -1,
                 "10am to 9pm",
                 true,
