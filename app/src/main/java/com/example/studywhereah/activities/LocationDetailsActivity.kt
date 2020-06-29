@@ -25,7 +25,7 @@ import com.google.android.libraries.places.api.model.OpeningHours
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_location_details.*
 
-
+//NOTE THAT THIS ENTIRE ACTIVITY IS NOT USED ANYMORE
 class LocationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //pass the details from Google Places to this Activity via the intent

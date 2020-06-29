@@ -5,22 +5,20 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.core.view.marginTop
 import androidx.fragment.app.FragmentActivity
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
-import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -32,10 +30,8 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.karumi.dexter.Dexter
@@ -43,6 +39,8 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_maps.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapReadyCallback {
 
@@ -61,10 +59,12 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var latitudeOfLocation: Double? = null
     private var longitudeOfLocation: Double? = null
     private var addressOfLocation: String? = null
-    private var rating: Double? = null
-//    private lateinit var openingHours: OpeningHours
-    private var userRatingsTotal: Int? = null
-    private var phoneNumber: String? = null
+    private var phoneNumber: Int? = null
+    // An ArrayList where operatingHours.get(0) is the opening time
+    // and operatingHours.get(1) is the closing time
+    private var operatingHours = ArrayList<Int>()
+    private var hasFood: Boolean? = null
+    private var hasPort: Boolean? = null
     private var imagesOfLocation = ArrayList<Int>()
 
     //An ArrayList of locations that exist in our database.
@@ -113,35 +113,22 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         ll_location_details.setVisibility(View.INVISIBLE)
         ll_button_row.bringToFront()
         bsb = BottomSheetBehavior.from(ll_location_details)
-        bsb.setPeekHeight(700, true)
+//        val scale: Float = resources.displayMetrics.density
+//        val peekPanelInPx = ((hsv_location_images.height + tv_location_detail_name.height) * scale + 0.5f).toInt()
+        bsb.setPeekHeight(940, true)
 
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
 
             nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
             latitudeOfLocation = intent.getDoubleExtra(Constants.LATITUDEOFLOCATION, 0.0)
             longitudeOfLocation = intent.getDoubleExtra(Constants.LONGITUDEOFLOCATION, 0.0)
+            addressOfLocation = intent.getStringExtra(Constants.ADDRESSOFLOCATION)
+            phoneNumber = intent.getIntExtra(Constants.PHONENUMBER, 0)
+            operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
+            hasFood = intent.getBooleanExtra(Constants.FOODAVAILABLE, false)
+            hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
             imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
 
-
-//            mMap.animateCamera(
-//                CameraUpdateFactory.newLatLngZoom(
-//                    LatLng(
-//                        latitudeOfLocation!!,
-//                        longitudeOfLocation!!
-//                    ), 15.0f
-//                )
-//            )
-//            mMap.addMarker(
-//                MarkerOptions().position(
-//                    LatLng(
-//                        latitudeOfLocation!!,
-//                        longitudeOfLocation!!
-//                    )
-//                )
-//                    .title(nameOfLocation)
-//            )
-
-            //Set address on searchbar_edit_text
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
             tv_search.text = nameOfLocation
@@ -149,15 +136,37 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             ll_location_details.setVisibility(View.VISIBLE)
             // set the TextViews to contain the results obtained from Google Places.
 
-            tv_location_detail_name.text = nameOfLocation
-            tv_location_detail_rating.text = rating.toString()
-            tv_location_ratings_total.text = userRatingsTotal.toString()
-            tv_location_type.text = "LIBRARY (hardcoded)"
             iv_location_detail1.setImageResource(imagesOfLocation.get(0))
             iv_location_detail2.setImageResource(imagesOfLocation.get(1))
-            tv_locationAddress.text =
-                "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
-
+            tv_location_detail_name.text = nameOfLocation
+            tv_location_detail_address.text = addressOfLocation
+            if (phoneNumber == -1) {
+                tv_location_detail_phone_number.text = "Not Available"
+            } else {
+                tv_location_detail_phone_number.text = phoneNumber.toString()
+            }
+            val openTime = operatingHours.get(0)
+            val closeTime = operatingHours.get(1)
+            val calObj = Calendar.getInstance()
+            val currTime = (calObj.get(Calendar.HOUR_OF_DAY) * 100) + (calObj.get(Calendar.MINUTE))
+            if (currTime >= openTime && currTime < closeTime) {
+                //Opened!
+                tv_location_detail_openOrClose.text = "Open"
+            } else {
+                tv_location_detail_openOrClose.text = "Closed"
+                tv_location_detail_openOrClose.setTextColor(Color.RED)
+            }
+            tv_location_detail_operating_hours.text = "" + openTime + " to " + closeTime
+            if (hasFood!!) {
+                tv_location_detail_food_available.text = "Food options nearby"
+            } else {
+                tv_location_detail_food_available.text = "Sadly, no food nearby"
+            }
+            if (hasPort!!) {
+                tv_location_detail_charging_ports.text = "Charging ports available"
+            } else {
+                tv_location_detail_food_available.text = "Sadly, no charging ports"
+            }
         }
 
         ll_location_details.setOnClickListener (object: View.OnClickListener {
@@ -174,13 +183,20 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         //button to toggle the overlay panel.
         btn_toggle_info.setOnClickListener(object: View.OnClickListener{
             override fun onClick(v: View?) {
-                if (tv_search.text != "Search") {
+                if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
+
                     if (ll_location_details.isVisible) {
                         //should tv_search be ll_button_row instead?
                         ll_location_details.setVisibility(View.INVISIBLE)
+                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+                        }
                     } else {
                         //need to add the feature of re centering the map when the info window is up.
                         ll_location_details.setVisibility(View.VISIBLE)
+                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
+                        }
                     }
                 }
 
@@ -217,31 +233,36 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
             //When success
             //Initialize place
+            //always hide the infopanel when using the searchbar.
+            ll_location_details.setVisibility(View.INVISIBLE)
+            //make the layout padding_bottom correct
+            tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+            }
             var place = Autocomplete.getPlaceFromIntent(data!!)
             var placeLatLng = place.latLng
             latitudeOfLocation = placeLatLng?.latitude
             longitudeOfLocation = placeLatLng?.longitude
-            addressOfLocation = place.address
+//            addressOfLocation = place.address
             nameOfLocation = place.name
-            rating = place.rating
-            userRatingsTotal = place.userRatingsTotal
-            phoneNumber = place.phoneNumber
 
-            ll_location_details.setVisibility(View.VISIBLE)
-            // set the TextViews to contain the results obtained from Google Places.
-            iv_location_detail1.setImageResource(curatedLocationList[1].getImages().get(0))
-            iv_location_detail2.setImageResource(curatedLocationList[1].getImages().get(1))
-            tv_location_detail_name.text = nameOfLocation
-            tv_location_detail_rating.text = rating.toString()
-            tv_location_ratings_total.text = userRatingsTotal.toString()
-            tv_location_type.text = "LIBRARY (hardcoded)"
-            tv_locationAddress.text = "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
+//            userRatingsTotal = place.userRatingsTotal
+//            phoneNumber = place.phoneNumber
+//
+//            ll_location_details.setVisibility(View.VISIBLE)
+//            // set the TextViews to contain the results obtained from Google Places.
+//            iv_location_detail1.setImageResource(curatedLocationList[1].getImages().get(0))
+//            iv_location_detail2.setImageResource(curatedLocationList[1].getImages().get(1))
+//            tv_location_detail_name.text = nameOfLocation
+//            tv_location_detail_rating.text = rating.toString()
+//            tv_location_ratings_total.text = userRatingsTotal.toString()
+//            tv_location_type.text = "LIBRARY (hardcoded)"
+//            tv_locationAddress.text = "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng!!, 15.0f))
-            mMap.addMarker(MarkerOptions().position(placeLatLng!!)
-                .title(nameOfLocation + ", CHECK IT OUT!" ))
+            mMap.addMarker(MarkerOptions().position(placeLatLng!!))
             //Set address on searchbar_edit_text
-//            tv_search.text = nameOfLocation
+            tv_search.text = nameOfLocation
             selectedLatitude = placeLatLng.latitude
             selectedLongitude = placeLatLng.longitude
             //We can get the locality name, lat and long from place.
@@ -267,7 +288,13 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         mMap = googleMap
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
-        tv_search.viewTreeObserver.addOnGlobalLayoutListener { mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20) }
+        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+            if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
+                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
+            } else {
+                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+            }
+        }
 
         mMap.setOnMapLoadedCallback(this)
         mMap?.apply {
