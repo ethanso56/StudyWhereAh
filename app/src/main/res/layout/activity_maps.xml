@@ -24,6 +24,15 @@
         android:orientation="horizontal"
         android:layout_gravity="bottom"
         >
+        <Button
+            android:id="@+id/btn_toggle_info"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/toggle_info_button"
+            android:textSize="15dp"
+            android:elevation="2dp"
+            android:background="@drawable/bg_button_toggle_panel"/>
 
         <Button
             android:id="@+id/btn_get_place1"
@@ -32,16 +41,8 @@
             android:layout_height="match_parent"
             android:textSize="15dp"
             android:text="Get Place!"
-            android:background="@drawable/bg_button_row"/>
-
-        <Button
-            android:id="@+id/btn_toggle_info"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:text="@string/toggle_info_button"
-            android:textSize="15dp"
-            android:background="@drawable/bg_button_row"/>
+            android:elevation="2dp"
+            android:background="@drawable/bg_button_get_place"/>
 
     </LinearLayout>
 
@@ -75,6 +76,7 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <HorizontalScrollView
+            android:id="@+id/hsv_location_images"
             android:layout_width="match_parent"
             android:layout_height="110dp">
 
@@ -85,13 +87,15 @@
 
                 <ImageView
                     android:id="@+id/iv_location_detail1"
-                    android:layout_width="200dp"
-                    android:layout_height="110dp"/>
+                    android:layout_width="196dp"
+                    android:layout_height="110dp"
+                    android:scaleType="fitXY"/>
 
                 <ImageView
                     android:id="@+id/iv_location_detail2"
-                    android:layout_width="200dp"
-                    android:layout_height="110dp" />
+                    android:layout_width="196dp"
+                    android:layout_height="110dp"
+                    android:scaleType="fitXY"/>
 
             </LinearLayout>
 
@@ -100,78 +104,140 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="15dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_location_detail_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textSize="30sp"
+                android:textSize="28sp"
+                android:textColor="@android:color/black"
+                android:padding="14dp"
+                android:text="Clementi Public Library"
+                android:background="@drawable/bg_slide_up_panel_tvs"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_location_detail_openOrClose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_openclose_black"
+                    android:text="Closed"/>
+
+                <TextView
+                    android:id="@+id/tv_location_detail_operating_hours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_clock_black"
+                    android:text="10pm-11pm"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_location_detail_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_location"
+                    android:text="3155 Commonwealth Avenue West #05-13/14/15 The Clementi Mall, S129588"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_location_detail_phone_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_phone_black"
+                    android:text="91112929"
+                    />
+
+
+
+                <TextView
+                    android:id="@+id/tv_location_detail_food_available"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_local_dining_black"
+                    android:text="food options available"
                 />
 
-            <TextView
-                android:id="@+id/tv_location_detail_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                />
-            <TextView
-                android:id="@+id/tv_location_ratings_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                />
-
-            <TextView
-                android:id="@+id/tv_location_type"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
+                <TextView
+                    android:id="@+id/tv_location_detail_charging_ports"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_battery_charging_30_black"
+                    android:text="charging ports available"
                 />
 
-            <TextView
-                android:id="@+id/tv_locationAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                />
+                <TextView
+                    android:id="@+id/tv_location_detail_navigation_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:drawablePadding="15dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:drawableLeft="@drawable/ic_navigation_black"
+                    android:text="20min"
+                    android:background="@drawable/bg_slide_up_panel_tvs"
+                    />
 
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_location_detail_openOrClose"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/tv_location_detail_navigation_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Qualities(To be NOT hardcoded):\n-Has charging ports \n-Quiet \n-Has food options nearby"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"/>
-
-
-            <Button
-                android:id="@+id/btn_navigate_here"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@color/colorPrimary"
-                android:text="NAVIGATE HERE"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_navigate_here"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorPrimary"
+            android:text="NAVIGATE HERE"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
     </LinearLayout>
 

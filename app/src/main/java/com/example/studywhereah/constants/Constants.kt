@@ -29,9 +29,7 @@ class Constants {
         const val CROWDLEVEL : String = "crowd_level"
         const val FOODAVAILABLE: String = "food_available"
         const val CHARGINGPORTS: String = "charging_ports"
-        const val RATING: String = "location_rating"
-        const val OPENINGHOURS: String = "location_opening_hours"
-        const val USERRATINGSTOTAL: String = "location_user_rating_total"
+        const val OPERATINGHOURS: String = "location_opening_hours"
         const val PHONENUMBER: String = "location_phone_number"
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -60,6 +58,8 @@ class Constants {
         }
 
         // Note that if the images are too big, the app can crash.
+        //Note that operatingHours has been chagned from type String to type ArrayList because this
+        //makes it easier to determine if the location is open at the current system time.
         fun getLocationList() : ArrayList<LocationModel> {
             Log.d("time", formatDateCurrentTime)
             val locationList = ArrayList<LocationModel>()
@@ -75,7 +75,7 @@ class Constants {
                         R.drawable.img_clementi_library2)
                 ),
                 -1,
-                "10am to 9pm",
+                ArrayList(listOf(1000, 2100)),
                 true,
                 true,
                 timeToCrowd("library", formatDateCurrentTime)
@@ -93,7 +93,7 @@ class Constants {
                 R.drawable.img_bedok_library1)
                 ),
                 63323255,
-                "10am to 9pm",
+                ArrayList(listOf(1000, 2100)),
                 true,
                 true,
                 timeToCrowd("library", formatDateCurrentTime)
@@ -111,7 +111,7 @@ class Constants {
                     R.drawable.img_yishun_library2))
                 ,
                 -1,
-                "10am to 9pm",
+                ArrayList(listOf(1000, 2100)),
                 true,
                 true,
                 timeToCrowd("library", formatDateCurrentTime)

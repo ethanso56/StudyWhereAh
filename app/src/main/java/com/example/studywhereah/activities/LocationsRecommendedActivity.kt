@@ -89,10 +89,12 @@ class LocationsRecommendedActivity : AppCompatActivity() {
             intent.putExtra(Constants.NAMEOFLOCATION, sortedLocationsList[0].getName())
             intent.putExtra(Constants.LATITUDEOFLOCATION, sortedLocationsList[0].getLatitude())
             intent.putExtra(Constants.LONGITUDEOFLOCATION, sortedLocationsList[0].getLongitude())
-            intent.putExtra(Constants.ADDRESSOFLOCATION, sortedLocationsList[1].getAddress())
+            intent.putExtra(Constants.ADDRESSOFLOCATION, sortedLocationsList[0].getAddress())
             intent.putExtra(Constants.IMAGESOFLOCATION, sortedLocationsList[0].getImages())
-            intent.putExtra(Constants.FOODAVAILABLE, sortedLocationsList[1].getFoodAvailable())
-            intent.putExtra(Constants.CHARGINGPORTS, sortedLocationsList[1].getChargingPorts())
+            intent.putExtra(Constants.OPERATINGHOURS, sortedLocationsList[0].getOperatingHours())
+            intent.putExtra(Constants.PHONENUMBER, sortedLocationsList[0].getPhoneNum())
+            intent.putExtra(Constants.FOODAVAILABLE, sortedLocationsList[0].getFoodAvailable())
+            intent.putExtra(Constants.CHARGINGPORTS, sortedLocationsList[0].getChargingPorts())
             //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
             intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
             startActivity(intent)
@@ -105,6 +107,8 @@ class LocationsRecommendedActivity : AppCompatActivity() {
             intent.putExtra(Constants.LONGITUDEOFLOCATION, sortedLocationsList[1].getLongitude())
             intent.putExtra(Constants.ADDRESSOFLOCATION, sortedLocationsList[1].getAddress())
             intent.putExtra(Constants.IMAGESOFLOCATION, sortedLocationsList[1].getImages())
+            intent.putExtra(Constants.OPERATINGHOURS, sortedLocationsList[1].getOperatingHours())
+            intent.putExtra(Constants.PHONENUMBER, sortedLocationsList[1].getPhoneNum())
             intent.putExtra(Constants.FOODAVAILABLE, sortedLocationsList[1].getFoodAvailable())
             intent.putExtra(Constants.CHARGINGPORTS, sortedLocationsList[1].getChargingPorts())
             //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
@@ -144,8 +148,16 @@ class LocationsRecommendedActivity : AppCompatActivity() {
         tv_location1Title.text = sortedLocationsList[0].getName()
 //        iv_location1.setImageResource(sortedLocationsList[0].getImage1())
         tv_location1Address.text = "• Address: " + sortedLocationsList[0].getAddress()
-        tv_phoneNum1.text = "• Phone number: " + sortedLocationsList[0].getPhoneNum().toString()
-        tv_operatingHours1.text = "• Operating hours: " + sortedLocationsList[0].getOperatingHours()
+        val phoneNum = sortedLocationsList[0].getPhoneNum()
+        if (phoneNum == -1) {
+            tv_phoneNum1.text = "• Phone number: Not Available"
+        } else {
+            tv_phoneNum1.text = "• Phone number: " + phoneNum.toString()
+        }
+        val openTime = sortedLocationsList[0].getOperatingHours()[0]
+        val closeTime = sortedLocationsList[0].getOperatingHours()[1]
+        tv_operatingHours1.text = "• Operating hours: " + openTime +" to " + closeTime
+        iv_location1.setImageResource(sortedLocationsList[0].getImages()[0])
 
     }
 
@@ -153,9 +165,17 @@ class LocationsRecommendedActivity : AppCompatActivity() {
         tv_location2Title.text = sortedLocationsList[1].getName()
 //        iv_location2.setImageResource(sortedLocationsList[1].getImage1())
         tv_location2Address.text = "• Address: " + sortedLocationsList[1].getAddress()
-        tv_phoneNum2.text = "• Phone number: " + sortedLocationsList[1].getPhoneNum().toString()
+        val phoneNum = sortedLocationsList[1].getPhoneNum()
+        if (phoneNum == -1) {
+            tv_phoneNum2.text = "• Phone number: Not Available"
+        } else {
+            tv_phoneNum2.text = "• Phone number: " + phoneNum.toString()
+        }
         tv_operatingHours2.text = "• Operating hours: " + sortedLocationsList[1].getOperatingHours()
-
+        val openTime = sortedLocationsList[1].getOperatingHours()[0]
+        val closeTime = sortedLocationsList[1].getOperatingHours()[1]
+        tv_operatingHours2.text = "• Operating hours: " + openTime +" to " + closeTime
+        iv_location2.setImageResource(sortedLocationsList[1].getImages()[0])
     }
 
 }

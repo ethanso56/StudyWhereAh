@@ -8,7 +8,7 @@ class LocationModel(
     private var distanceToUser: Double,
     private var imageArrList: ArrayList<Int>,
     private val phoneNum: Int,
-    private val operatingHours: String,
+    private val operatingHours: ArrayList<Int>,
     private val foodAvailable: Boolean,
     private val chargingPorts: Boolean,
     private val crowdLevel: Int
@@ -46,7 +46,7 @@ class LocationModel(
         return phoneNum
     }
 
-    fun getOperatingHours() : String {
+    fun getOperatingHours() : ArrayList<Int> {
         return operatingHours
     }
 
