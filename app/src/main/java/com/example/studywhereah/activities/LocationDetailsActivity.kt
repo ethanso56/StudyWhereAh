@@ -79,8 +79,7 @@ class LocationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     bsb.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
-        }
-        )
+        })
 
         btn_toggle_info.setOnClickListener(object: View.OnClickListener{
             override fun onClick(v: View?) {
