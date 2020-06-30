@@ -15,6 +15,14 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     defaultConfig {
         applicationId "com.example.studywhereah"
         minSdkVersion 21

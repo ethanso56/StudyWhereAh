@@ -79,16 +79,15 @@ class LocationDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     bsb.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
-        }
-        )
+        })
 
         btn_toggle_info.setOnClickListener(object: View.OnClickListener{
             override fun onClick(v: View?) {
                 if (ll_location_details.isVisible) {
-                    ll_location_details.setVisibility(View.INVISIBLE)
+                    ll_location_details.visibility = View.INVISIBLE
 //                    ll_location_details.animate().translationY(1.0f).start()
                 } else {
-                    ll_location_details.setVisibility(View.VISIBLE)
+                    ll_location_details.visibility = View.VISIBLE
                 }
             }
         })
