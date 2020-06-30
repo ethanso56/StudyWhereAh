@@ -119,7 +119,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        bsb.setPeekHeight(940, true)
         bsb.setPeekHeight(620, true)
 
-//        bsb.isHideable = true
 
         // once a location has been recommended
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
@@ -155,7 +154,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             val closeTime = operatingHours.get(1)
             val calObj = Calendar.getInstance()
             val currTime = (calObj.get(Calendar.HOUR_OF_DAY) * 100) + (calObj.get(Calendar.MINUTE))
-            if (currTime >= openTime && currTime < closeTime) {
+            if (currTime in openTime until closeTime) {
                 //Opened!
                 tv_location_detail_openOrClose.text = "Open"
             } else {
@@ -176,7 +175,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         }
 
         bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-
 
         ll_location_details.setOnClickListener {
             if (bsb.state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -309,7 +307,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         mMap?.apply {
             settleLocation()
             //the reason the code below is in onMapReady and not onCreate is because
-            //the map ahs to be initialized in order for the animate camera to work.
+            //the map has to be initialized in order for the animate camera to work.
             //Only if there is data passed from a previous activity
         }
     }
@@ -347,7 +345,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         if (report!!.areAllPermissionsGranted()) {
-
                             requestNewLocationData()
                         }
                     }
