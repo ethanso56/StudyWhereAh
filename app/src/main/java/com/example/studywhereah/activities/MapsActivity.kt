@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -110,13 +111,17 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         mapFragment.getMapAsync(this)
 
         //Enable the LinearLayout to work like a slide up panel
-        ll_location_details.setVisibility(View.INVISIBLE)
+        ll_location_details.visibility = View.INVISIBLE
         ll_button_row.bringToFront()
         bsb = BottomSheetBehavior.from(ll_location_details)
 //        val scale: Float = resources.displayMetrics.density
 //        val peekPanelInPx = ((hsv_location_images.height + tv_location_detail_name.height) * scale + 0.5f).toInt()
-        bsb.setPeekHeight(940, true)
+//        bsb.setPeekHeight(940, true)
+        bsb.setPeekHeight(620, true)
 
+//        bsb.isHideable = true
+
+        // once a location has been recommended
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
 
             nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
@@ -133,6 +138,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             selectedLongitude = longitudeOfLocation as Double
             tv_search.text = nameOfLocation
 
+            // make the location details appear
             ll_location_details.setVisibility(View.VISIBLE)
             // set the TextViews to contain the results obtained from Google Places.
 
@@ -169,39 +175,42 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             }
         }
 
-        ll_location_details.setOnClickListener (object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                if (bsb.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                    bsb.state = BottomSheetBehavior.STATE_EXPANDED
-                } else {
-                    bsb.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
+        bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+
+
+        ll_location_details.setOnClickListener {
+            if (bsb.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            } else if (bsb.state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                bsb.state = BottomSheetBehavior.STATE_EXPANDED
+            } else {
+                bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
         }
-        )
 
-        //button to toggle the overlay panel.
-        btn_toggle_info.setOnClickListener(object: View.OnClickListener{
-            override fun onClick(v: View?) {
-                if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
 
-                    if (ll_location_details.isVisible) {
-                        //should tv_search be ll_button_row instead?
-                        ll_location_details.setVisibility(View.INVISIBLE)
-                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
-                        }
-                    } else {
-                        //need to add the feature of re centering the map when the info window is up.
-                        ll_location_details.setVisibility(View.VISIBLE)
-                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
-                        }
-                    }
-                }
-
-            }
-        })
+//        //button to toggle the overlay panel.
+//        btn_toggle_info.setOnClickListener(object: View.OnClickListener{
+//            override fun onClick(v: View?) {
+//                if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
+//
+//                    if (ll_location_details.isVisible) {
+//                        //should tv_search be ll_button_row instead?
+//                        ll_location_details.setVisibility(View.INVISIBLE)
+//                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+//                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+//                        }
+//                    } else {
+//                        //need to add the feature of re centering the map when the info window is up.
+//                        ll_location_details.setVisibility(View.VISIBLE)
+//                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
+//                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
+//                        }
+//                    }
+//                }
+//
+//            }
+//        })
 
         btn_get_place1.setOnClickListener {
             val intent = Intent(this, ChoosePreferencesActivity::class.java)

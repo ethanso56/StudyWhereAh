@@ -14,7 +14,6 @@ import java.util.Arrays.asList
 
 class Constants {
 
-
     companion object {
         //the following const vals are keys to access values passed on by intents via the putExtra() methods
         const val CURRENTLATITUDE: String = "current_latitude"
@@ -59,7 +58,7 @@ class Constants {
         }
 
         // Note that if the images are too big, the app can crash.
-        //Note that operatingHours has been chagned from type String to type ArrayList because this
+        //Note that operatingHours has been changed from type String to type ArrayList because this
         //makes it easier to determine if the location is open at the current system time.
         fun getLocationList() : ArrayList<LocationModel> {
             Log.d("time", formatDateCurrentTime)
