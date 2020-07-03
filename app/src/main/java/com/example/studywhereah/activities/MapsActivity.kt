@@ -40,6 +40,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_maps.*
+import java.nio.DoubleBuffer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -137,6 +138,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             selectedLongitude = longitudeOfLocation as Double
             tv_search.text = nameOfLocation
 
+            // make the saved locations button disappear
+            btn_saved_locations.visibility = View.INVISIBLE
+
             // make the location details appear
             ll_location_details.setVisibility(View.VISIBLE)
             // set the TextViews to contain the results obtained from Google Places.
@@ -144,6 +148,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             iv_location_detail1.setImageResource(imagesOfLocation.get(0))
             iv_location_detail2.setImageResource(imagesOfLocation.get(1))
             tv_location_detail_name.text = nameOfLocation
+
+            btn_save_location.setOnClickListener {
+                saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+            }
+
             tv_location_detail_address.text = addressOfLocation
             if (phoneNumber == -1) {
                 tv_location_detail_phone_number.text = "Not Available"
@@ -184,6 +193,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             } else {
                 bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
+        }
+
+        btn_saved_locations.setOnClickListener {
+            val intent = Intent(this, SavedLocationsActivity::class.java)
+            startActivity(intent)
         }
 
 
@@ -409,6 +423,10 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        mMap.addMarker(MarkerOptions().position(location).title("Your current location"))
     }
 
-
+    private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double) {
+        val dbHandler = SqliteOpenHelper(this, null)
+        dbHandler.addLocation(name, address, latitude, longitude)
+        Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
+    }
 
 }
