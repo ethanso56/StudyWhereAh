@@ -7,9 +7,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.studywhereah.R
-import kotlinx.android.synthetic.main.activity_locations_recommended.*
+import com.example.studywhereah.adapters.SavedLocationsAdaptor
+import com.example.studywhereah.models.SavedLocationModel
 import kotlinx.android.synthetic.main.activity_saved_locations.*
-import kotlinx.android.synthetic.main.item_saved_locations_row.*
 
 class SavedLocationsActivity : AppCompatActivity() {
 
@@ -29,42 +29,65 @@ class SavedLocationsActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        getAllSavedLocations()
+        setupListOfDataIntoRecyclerView()
 
     }
 
-    private fun getAllSavedLocations() {
+    fun setupListOfDataIntoRecyclerView() {
         val dbHandler = SqliteOpenHelper(this, null)
-        val allSavedLocationsNamesList = dbHandler.getAllSavedLocationsNameList()
-        val allSavedLocationsAddressList = dbHandler.getAllSavedLocationsAddressList()
+        val allSavedLocationsList = dbHandler.viewLocation()
 
-        if (allSavedLocationsNamesList.size > 0) {
-//            tvSavedLocations.visibility = View.VISIBLE
+        if (allSavedLocationsList.size > 0) {
             rvSavedLocations.visibility = View.VISIBLE
             tvNoDataAvailable.visibility = View.GONE
 
             rvSavedLocations.layoutManager = LinearLayoutManager(this)
-            val savedLocationsAdaptor = SavedLocationsAdaptor(this, allSavedLocationsNamesList, allSavedLocationsAddressList)
+            val savedLocationsAdaptor = SavedLocationsAdaptor(this, allSavedLocationsList)
             rvSavedLocations.adapter = savedLocationsAdaptor
         } else {
-//            tvSavedLocations.visibility = View.GONE
             rvSavedLocations.visibility = View.GONE
             tvNoDataAvailable.visibility = View.VISIBLE
         }
     }
 
-    fun deleteSavedLocationAlertDialog(name: String) {
+
+//    private fun getAllSavedLocations() {
+//        val dbHandler = SqliteOpenHelper(this, null)
+//        val allSavedLocationsNamesList = dbHandler.getAllSavedLocationsNameList()
+//        val allSavedLocationsAddressList = dbHandler.getAllSavedLocationsAddressList()
+//
+//        if (allSavedLocationsNamesList.size > 0) {
+////            tvSavedLocations.visibility = View.VISIBLE
+//            rvSavedLocations.visibility = View.VISIBLE
+//            tvNoDataAvailable.visibility = View.GONE
+//
+//            rvSavedLocations.layoutManager = LinearLayoutManager(this)
+//            val savedLocationsAdaptor =
+//                SavedLocationsAdaptor(
+//                    this,
+//                    allSavedLocationsNamesList,
+//                    allSavedLocationsAddressList
+//                )
+//            rvSavedLocations.adapter = savedLocationsAdaptor
+//        } else {
+////            tvSavedLocations.visibility = View.GONE
+//            rvSavedLocations.visibility = View.GONE
+//            tvNoDataAvailable.visibility = View.VISIBLE
+//        }
+//    }
+
+    fun deleteSavedLocationAlertDialog(slm: SavedLocationModel) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Delete Location")
-        builder.setMessage("Are you sure you want to delete $name?")
+        builder.setMessage("Are you sure you want to delete?")
         builder.setIcon(R.drawable.ic_warning_black_24dp)
 
         builder.setPositiveButton("Yes") { dialogInterface, which ->
             val dbHandler = SqliteOpenHelper(this, null)
-            val status = dbHandler.deleteLocation(name)
+            val status = dbHandler.deleteLocation(slm)
             if (status > -1) {
                 Toast.makeText(applicationContext, "Location deleted successfully.", Toast.LENGTH_SHORT).show()
-                getAllSavedLocations()
+                setupListOfDataIntoRecyclerView()
             }
             dialogInterface.dismiss()
         }

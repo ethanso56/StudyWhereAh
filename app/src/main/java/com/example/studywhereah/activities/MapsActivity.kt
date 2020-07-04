@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
+import com.example.studywhereah.models.SavedLocationModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -425,8 +426,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
     private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double) {
         val dbHandler = SqliteOpenHelper(this, null)
-        dbHandler.addLocation(name, address, latitude, longitude)
-        Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
+        val slm = SavedLocationModel(0, name, address, latitude, longitude)
+        val status = dbHandler.addLocation(slm)
+        if (status > 0) {
+            Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

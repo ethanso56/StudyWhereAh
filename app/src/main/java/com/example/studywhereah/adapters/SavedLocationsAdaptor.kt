@@ -1,15 +1,18 @@
-package com.example.studywhereah.activities
+package com.example.studywhereah.adapters
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.studywhereah.R
+import com.example.studywhereah.activities.SavedLocationsActivity
+import com.example.studywhereah.models.SavedLocationModel
 import kotlinx.android.synthetic.main.item_saved_locations_row.view.*
 
-class SavedLocationsAdaptor(val context: Context, val names: ArrayList<String>, val address: ArrayList<String>) :
+class SavedLocationsAdaptor(val context: Context, val items: ArrayList<SavedLocationModel>) :
     RecyclerView.Adapter<SavedLocationsAdaptor.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -22,20 +25,20 @@ class SavedLocationsAdaptor(val context: Context, val names: ArrayList<String>, 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(context).inflate(
-            R.layout.item_saved_locations_row, parent, false
-        ))
+                R.layout.item_saved_locations_row, parent, false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
-        return names.size
+        return items.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val name : String = names[position]
-        val address : String = address[position]
+        val item = items[position]
 
-        holder.tvName.text = name
-        holder.tvAddress.text = address
+        holder.tvName.text = item.name
+        holder.tvAddress.text = item.address
 
         if (position % 2 == 0) {
             holder.llSavedLocationsMainItem.setBackgroundColor(
@@ -49,7 +52,7 @@ class SavedLocationsAdaptor(val context: Context, val names: ArrayList<String>, 
 
         holder.ivDelete.setOnClickListener{ view ->
             if (context is SavedLocationsActivity) {
-                context.deleteSavedLocationAlertDialog(name)
+                context.deleteSavedLocationAlertDialog(item)
             }
         }
     }
