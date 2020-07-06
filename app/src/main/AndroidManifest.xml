@@ -17,14 +17,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.SavedLocationsActivity"></activity>
         <activity
             android:name=".activities.LocationDetailsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomNoActionBarTheme"/>
+            android:theme="@style/CustomNoActionBarTheme" />
         <activity
             android:name=".activities.LocationsRecommendedActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomNoActionBarTheme"/>
+            android:theme="@style/CustomNoActionBarTheme" />
         <activity
             android:name=".activities.ChoosePreferencesActivity"
             android:screenOrientation="portrait"

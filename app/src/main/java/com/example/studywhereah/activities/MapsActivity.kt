@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
+import com.example.studywhereah.models.SavedLocationModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -40,6 +41,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_maps.*
+import java.nio.DoubleBuffer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -67,6 +69,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var hasFood: Boolean? = null
     private var hasPort: Boolean? = null
     private var imagesOfLocation = ArrayList<Int>()
+
+    private var saveBtnClicked : Boolean = false
 
     //An ArrayList of locations that exist in our database.
     // maybe change it to a hashtable?
@@ -103,6 +107,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
             var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
                 .setCountry("SG")
+                .setInitialQuery(nameOfLocation)
                 .build(this@MapsActivity)
 
             startActivityForResult(intent, 100)
@@ -119,7 +124,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        bsb.setPeekHeight(940, true)
         bsb.setPeekHeight(620, true)
 
-//        bsb.isHideable = true
 
         // once a location has been recommended
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
@@ -138,13 +142,30 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             selectedLongitude = longitudeOfLocation as Double
             tv_search.text = nameOfLocation
 
+            // make the saved locations button disappear
+            btn_saved_locations.visibility = View.INVISIBLE
+
             // make the location details appear
-            ll_location_details.setVisibility(View.VISIBLE)
+            ll_location_details.visibility = View.VISIBLE
             // set the TextViews to contain the results obtained from Google Places.
 
             iv_location_detail1.setImageResource(imagesOfLocation.get(0))
             iv_location_detail2.setImageResource(imagesOfLocation.get(1))
             tv_location_detail_name.text = nameOfLocation
+
+            btn_save_location.setOnClickListener {
+                if (!saveBtnClicked) {
+                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
+                    saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+                    saveBtnClicked = true
+                } //else {
+//                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
+//                    deleteLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+//                    saveBtnClicked = false
+//                }
+
+            }
+
             tv_location_detail_address.text = addressOfLocation
             if (phoneNumber == -1) {
                 tv_location_detail_phone_number.text = "Not Available"
@@ -155,7 +176,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             val closeTime = operatingHours.get(1)
             val calObj = Calendar.getInstance()
             val currTime = (calObj.get(Calendar.HOUR_OF_DAY) * 100) + (calObj.get(Calendar.MINUTE))
-            if (currTime >= openTime && currTime < closeTime) {
+            if (currTime in openTime until closeTime) {
                 //Opened!
                 tv_location_detail_openOrClose.text = "Open"
             } else {
@@ -177,7 +198,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
         bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
-
         ll_location_details.setOnClickListener {
             if (bsb.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
@@ -186,6 +206,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             } else {
                 bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
+        }
+
+        btn_saved_locations.setOnClickListener {
+            val intent = Intent(this, SavedLocationsActivity::class.java)
+            startActivity(intent)
         }
 
 
@@ -309,7 +334,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         mMap?.apply {
             settleLocation()
             //the reason the code below is in onMapReady and not onCreate is because
-            //the map ahs to be initialized in order for the animate camera to work.
+            //the map has to be initialized in order for the animate camera to work.
             //Only if there is data passed from a previous activity
         }
     }
@@ -347,7 +372,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         if (report!!.areAllPermissionsGranted()) {
-
                             requestNewLocationData()
                         }
                     }
@@ -412,6 +436,25 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        mMap.addMarker(MarkerOptions().position(location).title("Your current location"))
     }
 
+    private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double) {
+        val dbHandler = SqliteOpenHelper(this, null)
+        val slm = SavedLocationModel(0, name, address, latitude, longitude)
+        val status = dbHandler.addLocation(slm)
+        if (status > 0) {
+            Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
+        }
+    }
 
+//    private fun deleteLocation(name: String, address: String, latitude: Double, longitude: Double) {
+//        val dbHandler = SqliteOpenHelper(this, null)
+//        val slm = SavedLocationModel(1, name, address, latitude, longitude)
+//        val status = dbHandler.deleteLocation(slm)
+////        Toast.makeText(this, "$status", Toast.LENGTH_SHORT).show()
+//        if (status > -1) {
+//            Toast.makeText(this, "Location Deleted", Toast.LENGTH_SHORT).show()
+//        } else {
+//            Toast.makeText(this, "$status", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 }
