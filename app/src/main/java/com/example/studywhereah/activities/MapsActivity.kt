@@ -107,6 +107,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
             var intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList)
                 .setCountry("SG")
+                .setInitialQuery(nameOfLocation)
                 .build(this@MapsActivity)
 
             startActivityForResult(intent, 100)
