@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import android.widget.Toast
 import com.example.studywhereah.models.SavedLocationModel
 
@@ -46,20 +47,11 @@ class SqliteOpenHelper(
         return success
     }
 
-//    fun deleteLocation(name: String): Int {
-//        val db = this.writableDatabase
-//        val contentValues = ContentValues()
-//        contentValues.put(COLUMN_NAME, name)
-//        // delete row
-//        val success = db.delete(TABLE_SAVED_LOCATIONS, COLUMN_NAME + "=" + name, null)
-//        db.close()
-//        return success
-//    }
-
     fun deleteLocation(slm: SavedLocationModel): Int {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(COLUMN_ID, slm.id)
+        Log.e("id", slm.id.toString())
         // delete row
         val success = db.delete(TABLE_SAVED_LOCATIONS, COLUMN_ID + "=" + slm.id, null)
         db.close()
@@ -102,77 +94,6 @@ class SqliteOpenHelper(
         }
         return slmList
     }
-
-//        /**
-//     * Function returns the list of history table data.
-//     */
-//    fun getAllSavedLocationsNameList(): ArrayList<String> {
-//        val list = ArrayList<String>() // ArrayList is initialized
-//        val db = this.readableDatabase // Create and/or open a database that will be used for reading and writing.
-//
-//        // Runs the provided SQL and returns a Cursor over the result set.
-//        // Query for selecting all the data from saved locations table.
-//        val cursor = db.rawQuery("SELECT * FROM $TABLE_SAVED_LOCATIONS", null)
-//
-//        // Move the cursor to the next row.
-//        while (cursor.moveToNext()) {
-//            // Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
-//            list.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME))) // value is added in the list
-//        }
-//        cursor.close() // Cursor is closed after its used.
-//        return list // List is returned.
-//    }
-//
-//    fun getAllSavedLocationsAddressList(): ArrayList<String> {
-//        val list = ArrayList<String>() // ArrayList is initialized
-//        val db = this.readableDatabase // Create and/or open a database that will be used for reading and writing.
-//
-//        // Runs the provided SQL and returns a Cursor over the result set.
-//        // Query for selecting all the data from saved locations table.
-//        val cursor = db.rawQuery("SELECT * FROM $TABLE_SAVED_LOCATIONS", null)
-//
-//        // Move the cursor to the next row.
-//        while (cursor.moveToNext()) {
-//            // Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
-//            list.add(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESS))) // value is added in the list
-//        }
-//        cursor.close() // Cursor is closed after its used.
-//        return list // List is returned.
-//    }
-//
-//    fun getAllSavedLocationsLatitudeList(): ArrayList<Double> {
-//        val list = ArrayList<Double>() // ArrayList is initialized
-//        val db = this.readableDatabase // Create and/or open a database that will be used for reading and writing.
-//
-//        // Runs the provided SQL and returns a Cursor over the result set.
-//        // Query for selecting all the data from saved locations table.
-//        val cursor = db.rawQuery("SELECT * FROM $TABLE_SAVED_LOCATIONS", null)
-//
-//        // Move the cursor to the next row.
-//        while (cursor.moveToNext()) {
-//            // Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
-//            list.add(cursor.getDouble(cursor.getColumnIndex(COLUMN_LATITUDE))) // value is added in the list
-//        }
-//        cursor.close() // Cursor is closed after its used.
-//        return list // List is returned.
-//    }
-//
-//    fun getAllSavedLocationsLongitudeList(): ArrayList<Double> {
-//        val list = ArrayList<Double>() // ArrayList is initialized
-//        val db = this.readableDatabase // Create and/or open a database that will be used for reading and writing.
-//
-//        // Runs the provided SQL and returns a Cursor over the result set.
-//        // Query for selecting all the data from saved locations table.
-//        val cursor = db.rawQuery("SELECT * FROM $TABLE_SAVED_LOCATIONS", null)
-//
-//        // Move the cursor to the next row.
-//        while (cursor.moveToNext()) {
-//            // Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
-//            list.add(cursor.getDouble(cursor.getColumnIndex(COLUMN_LONGITUDE))) // value is added in the list
-//        }
-//        cursor.close() // Cursor is closed after its used.
-//        return list // List is returned.
-//    }
 
     companion object {
         private const val DATABASE_VERSION = 2 // This DATABASE Version

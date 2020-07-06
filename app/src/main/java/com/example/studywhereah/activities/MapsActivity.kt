@@ -70,6 +70,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var hasPort: Boolean? = null
     private var imagesOfLocation = ArrayList<Int>()
 
+    private var saveBtnClicked : Boolean = false
+
     //An ArrayList of locations that exist in our database.
     // maybe change it to a hashtable?
     private var curatedLocationList = Constants.getLocationList()
@@ -143,7 +145,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             btn_saved_locations.visibility = View.INVISIBLE
 
             // make the location details appear
-            ll_location_details.setVisibility(View.VISIBLE)
+            ll_location_details.visibility = View.VISIBLE
             // set the TextViews to contain the results obtained from Google Places.
 
             iv_location_detail1.setImageResource(imagesOfLocation.get(0))
@@ -151,7 +153,16 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             tv_location_detail_name.text = nameOfLocation
 
             btn_save_location.setOnClickListener {
-                saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+                if (!saveBtnClicked) {
+                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
+                    saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+                    saveBtnClicked = true
+                } //else {
+//                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
+//                    deleteLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+//                    saveBtnClicked = false
+//                }
+
             }
 
             tv_location_detail_address.text = addressOfLocation
@@ -432,5 +443,17 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
         }
     }
+
+//    private fun deleteLocation(name: String, address: String, latitude: Double, longitude: Double) {
+//        val dbHandler = SqliteOpenHelper(this, null)
+//        val slm = SavedLocationModel(1, name, address, latitude, longitude)
+//        val status = dbHandler.deleteLocation(slm)
+////        Toast.makeText(this, "$status", Toast.LENGTH_SHORT).show()
+//        if (status > -1) {
+//            Toast.makeText(this, "Location Deleted", Toast.LENGTH_SHORT).show()
+//        } else {
+//            Toast.makeText(this, "$status", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 }

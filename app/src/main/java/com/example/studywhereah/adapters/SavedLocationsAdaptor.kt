@@ -12,7 +12,7 @@ import com.example.studywhereah.activities.SavedLocationsActivity
 import com.example.studywhereah.models.SavedLocationModel
 import kotlinx.android.synthetic.main.item_saved_locations_row.view.*
 
-class SavedLocationsAdaptor(val context: Context, val items: ArrayList<SavedLocationModel>) :
+class SavedLocationsAdaptor(val context: Context, private val items: ArrayList<SavedLocationModel>) :
     RecyclerView.Adapter<SavedLocationsAdaptor.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

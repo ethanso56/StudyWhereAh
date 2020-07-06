@@ -33,7 +33,7 @@ class SavedLocationsActivity : AppCompatActivity() {
 
     }
 
-    fun setupListOfDataIntoRecyclerView() {
+    private fun setupListOfDataIntoRecyclerView() {
         val dbHandler = SqliteOpenHelper(this, null)
         val allSavedLocationsList = dbHandler.viewLocation()
 
@@ -50,32 +50,6 @@ class SavedLocationsActivity : AppCompatActivity() {
         }
     }
 
-
-//    private fun getAllSavedLocations() {
-//        val dbHandler = SqliteOpenHelper(this, null)
-//        val allSavedLocationsNamesList = dbHandler.getAllSavedLocationsNameList()
-//        val allSavedLocationsAddressList = dbHandler.getAllSavedLocationsAddressList()
-//
-//        if (allSavedLocationsNamesList.size > 0) {
-////            tvSavedLocations.visibility = View.VISIBLE
-//            rvSavedLocations.visibility = View.VISIBLE
-//            tvNoDataAvailable.visibility = View.GONE
-//
-//            rvSavedLocations.layoutManager = LinearLayoutManager(this)
-//            val savedLocationsAdaptor =
-//                SavedLocationsAdaptor(
-//                    this,
-//                    allSavedLocationsNamesList,
-//                    allSavedLocationsAddressList
-//                )
-//            rvSavedLocations.adapter = savedLocationsAdaptor
-//        } else {
-////            tvSavedLocations.visibility = View.GONE
-//            rvSavedLocations.visibility = View.GONE
-//            tvNoDataAvailable.visibility = View.VISIBLE
-//        }
-//    }
-
     fun deleteSavedLocationAlertDialog(slm: SavedLocationModel) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Delete Location")
@@ -84,7 +58,7 @@ class SavedLocationsActivity : AppCompatActivity() {
 
         builder.setPositiveButton("Yes") { dialogInterface, which ->
             val dbHandler = SqliteOpenHelper(this, null)
-            val status = dbHandler.deleteLocation(slm)
+            val status = dbHandler.deleteLocation(slm) //1
             if (status > -1) {
                 Toast.makeText(applicationContext, "Location deleted successfully.", Toast.LENGTH_SHORT).show()
                 setupListOfDataIntoRecyclerView()
@@ -98,9 +72,6 @@ class SavedLocationsActivity : AppCompatActivity() {
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(false)
         alertDialog.show()
-//        val dbHandler = SqliteOpenHelper(this, null)
-//        dbHandler.deleteLocation(name)
-
     }
 
 }
