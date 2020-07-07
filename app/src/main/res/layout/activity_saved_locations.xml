@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".activities.SavedLocationsActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_saved_locations_activity"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="#FFFFFF" />
+
+    <!--TODO(Step 1 : Added a RecyclerView to show the list of completed dates in the History Screen UI.)-->
+    <!--START-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvSavedLocations"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:gravity="center"-->
+<!--            android:text="SAVED LOCATIONS"-->
+<!--            android:textSize="18sp"-->
+<!--            android:visibility="gone"-->
+<!--            tools:visibility="visible" />-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSavedLocations"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvNoDataAvailable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="NO SAVED LOCATIONS"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            android:visibility="visible"
+            tools:visibility="gone" />
+    </LinearLayout>
+    <!--END-->
+</LinearLayout>
