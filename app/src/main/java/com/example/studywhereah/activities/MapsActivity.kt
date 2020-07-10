@@ -122,7 +122,28 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        val scale: Float = resources.displayMetrics.density
 //        val peekPanelInPx = ((hsv_location_images.height + tv_location_detail_name.height) * scale + 0.5f).toInt()
 //        bsb.setPeekHeight(940, true)
-        bsb.setPeekHeight(620, true)
+        hsv_location_images.measure(0,0)
+        tv_location_detail_name.measure(0, 0)
+        tv_location_detail_openOrClose.measure(0,0)
+        tv_location_detail_operating_hours.measure(0, 0)
+        btn_get_place1.measure(0, 0)
+        val hsvHeightInPx = hsv_location_images.measuredHeight
+        val placeNameHeightInPx = tv_location_detail_name.measuredHeight
+        val getPlaceBtnHeightInPx = btn_get_place1.measuredHeight
+        val peekHeight = hsvHeightInPx + placeNameHeightInPx + getPlaceBtnHeightInPx
+        bsb.setPeekHeight(peekHeight, true)
+
+        // set the half expanded height to always be showing
+        // the horiScrollView, place name, openOrClose and operatingHours.
+        val openOrCloseHeightInPx = tv_location_detail_openOrClose.measuredHeight
+        val operatingHoursHeightInPx = tv_location_detail_operating_hours.measuredHeight
+        val screenHeight = this.resources.displayMetrics.heightPixels
+        // 50px is added to the height of the peek panel so as to keep the panel nicely cut off
+        // just below operatingHours
+        val ratio: Float =
+            ((getPlaceBtnHeightInPx + operatingHoursHeightInPx + openOrCloseHeightInPx +
+                    placeNameHeightInPx + hsvHeightInPx + 50).toFloat() / screenHeight.toFloat())
+        bsb.halfExpandedRatio = (ratio)
 
 
         // once a location has been recommended
@@ -141,6 +162,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
             tv_search.text = nameOfLocation
+//            tv_search.text = ((getPlaceBtnHeightInPx + operatingHoursHeightInPx + openOrCloseHeightInPx +
+//                    placeNameHeightInPx + hsvHeightInPx).toFloat()/screenHeight.toFloat()).toString()
 
             // make the saved locations button disappear
             btn_saved_locations.visibility = View.INVISIBLE
@@ -270,8 +293,10 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             //always hide the infopanel when using the searchbar.
             ll_location_details.setVisibility(View.INVISIBLE)
             //make the layout padding_bottom correct
+            tv_search.measure(0, 0)
+            ll_button_row.measure(0, 0)
             tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+                mMap.setPadding(0, tv_search.measuredHeight, 0, ll_button_row.measuredHeight)
             }
             var place = Autocomplete.getPlaceFromIntent(data!!)
             var placeLatLng = place.latLng
@@ -322,11 +347,25 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         mMap = googleMap
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
+        tv_search.measure(0, 0)
+        ll_button_row.measure(0, 0)
+        val searchBarHeightInPx = tv_search.measuredHeight
+        val buttonRowHeightInPx = ll_button_row.measuredHeight
         tv_search.viewTreeObserver.addOnGlobalLayoutListener {
             if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
-                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
+                hsv_location_images.measure(0,0)
+                tv_location_detail_name.measure(0, 0)
+                tv_location_detail_openOrClose.measure(0,0)
+                tv_location_detail_operating_hours.measure(0, 0)
+                val hsvHeightInPx = hsv_location_images.measuredHeight
+                val placeNameHeightInPx = tv_location_detail_name.measuredHeight
+                val openOrCloseHeightInPx = tv_location_detail_openOrClose.measuredHeight
+                val operatingHoursHeightInPx = tv_location_detail_operating_hours.measuredHeight
+                val bottomPadding = hsvHeightInPx + placeNameHeightInPx +
+                        openOrCloseHeightInPx + operatingHoursHeightInPx + buttonRowHeightInPx
+                mMap.setPadding(0, searchBarHeightInPx, 0, bottomPadding)
             } else {
-                mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
+                mMap.setPadding(0, searchBarHeightInPx, 0, buttonRowHeightInPx)
             }
         }
 
