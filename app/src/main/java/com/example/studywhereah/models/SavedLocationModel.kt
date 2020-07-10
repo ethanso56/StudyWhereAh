@@ -7,4 +7,5 @@ class SavedLocationModel(
     val latitude: Double,
     val longitude: Double
 ) {
+
 }

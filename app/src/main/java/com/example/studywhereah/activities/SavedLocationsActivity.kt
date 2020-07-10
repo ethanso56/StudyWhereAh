@@ -1,5 +1,6 @@
 package com.example.studywhereah.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -8,10 +9,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.studywhereah.R
 import com.example.studywhereah.adapters.SavedLocationsAdaptor
+import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.SavedLocationModel
 import kotlinx.android.synthetic.main.activity_saved_locations.*
+import kotlinx.android.synthetic.main.item_saved_locations_row.*
 
 class SavedLocationsActivity : AppCompatActivity() {
+
+    private var nameOfLocation: String? = null
+    private var latitudeOfLocation: Double? = null
+    private var longitudeOfLocation: Double? = null
+    private var addressOfLocation: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +80,24 @@ class SavedLocationsActivity : AppCompatActivity() {
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(false)
         alertDialog.show()
+    }
+
+    fun showLocationDetails(slm: SavedLocationModel) {
+        nameOfLocation = slm.name
+        latitudeOfLocation = slm.latitude
+        longitudeOfLocation = slm.longitude
+        addressOfLocation = slm.address
+
+        val intent = Intent(this, MapsActivity::class.java)
+        intent.putExtra(Constants.NAMEOFLOCATION, nameOfLocation)
+        intent.putExtra(Constants.LATITUDEOFLOCATION, latitudeOfLocation!!)
+        intent.putExtra(Constants.LONGITUDEOFLOCATION, longitudeOfLocation!!)
+        intent.putExtra(Constants.ADDRESSOFLOCATION, addressOfLocation)
+
+        //Line below is to tell MapsActivity when Mapactivity was launched from SavedLocationsActivity
+        intent.putExtra("CALLINGACTIVITY", "SavedLocationsActivity")
+        startActivity(intent)
+
     }
 
 }

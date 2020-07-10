@@ -146,7 +146,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         bsb.halfExpandedRatio = (ratio)
 
 
-        // once a location has been recommended
+        // coming from LocationsRecommendedActivity
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
 
             nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
@@ -170,10 +170,10 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
             // make the location details appear
             ll_location_details.visibility = View.VISIBLE
-            // set the TextViews to contain the results obtained from Google Places.
 
-            iv_location_detail1.setImageResource(imagesOfLocation.get(0))
-            iv_location_detail2.setImageResource(imagesOfLocation.get(1))
+            // set the TextViews to contain the results obtained from Google Places.
+            iv_location_detail1.setImageResource(imagesOfLocation[0])
+            iv_location_detail2.setImageResource(imagesOfLocation[1])
             tv_location_detail_name.text = nameOfLocation
 
             btn_save_location.setOnClickListener {
@@ -195,8 +195,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             } else {
                 tv_location_detail_phone_number.text = phoneNumber.toString()
             }
-            val openTime = operatingHours.get(0)
-            val closeTime = operatingHours.get(1)
+            val openTime = operatingHours[0]
+            val closeTime = operatingHours[1]
             val calObj = Calendar.getInstance()
             val currTime = (calObj.get(Calendar.HOUR_OF_DAY) * 100) + (calObj.get(Calendar.MINUTE))
             if (currTime in openTime until closeTime) {
@@ -219,6 +219,30 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             }
         }
 
+        if (intent.getStringExtra("CALLINGACTIVITY") == "SavedLocationsActivity") {
+            nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
+            latitudeOfLocation = intent.getDoubleExtra(Constants.LATITUDEOFLOCATION, 0.0)
+            longitudeOfLocation = intent.getDoubleExtra(Constants.LONGITUDEOFLOCATION, 0.0)
+            addressOfLocation = intent.getStringExtra(Constants.ADDRESSOFLOCATION)
+            selectedLatitude = latitudeOfLocation as Double
+            selectedLongitude = longitudeOfLocation as Double
+
+            tv_search.text = nameOfLocation
+
+            // make the saved locations button disappear
+            btn_saved_locations.visibility = View.INVISIBLE
+
+            // make the location details appear
+            ll_location_details.visibility = View.VISIBLE
+
+            tv_location_detail_name.text = nameOfLocation
+
+            btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
+
+            tv_location_detail_address.text = addressOfLocation
+
+        }
+
         bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
         ll_location_details.setOnClickListener {
@@ -235,30 +259,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             val intent = Intent(this, SavedLocationsActivity::class.java)
             startActivity(intent)
         }
-
-
-//        //button to toggle the overlay panel.
-//        btn_toggle_info.setOnClickListener(object: View.OnClickListener{
-//            override fun onClick(v: View?) {
-//                if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
-//
-//                    if (ll_location_details.isVisible) {
-//                        //should tv_search be ll_button_row instead?
-//                        ll_location_details.setVisibility(View.INVISIBLE)
-//                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-//                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height +20)
-//                        }
-//                    } else {
-//                        //need to add the feature of re centering the map when the info window is up.
-//                        ll_location_details.setVisibility(View.VISIBLE)
-//                        tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-//                            mMap.setPadding(0, tv_search.height + 40, 0, ll_button_row.height + 800)
-//                        }
-//                    }
-//                }
-//
-//            }
-//        })
 
         btn_get_place1.setOnClickListener {
             val intent = Intent(this, ChoosePreferencesActivity::class.java)

@@ -55,5 +55,10 @@ class SavedLocationsAdaptor(val context: Context, private val items: ArrayList<S
                 context.deleteSavedLocationAlertDialog(item)
             }
         }
+        holder.llSavedLocationsMainItem.setOnClickListener {view ->
+            if (context is SavedLocationsActivity) {
+                context.showLocationDetails(item)
+            }
+        }
     }
 }
