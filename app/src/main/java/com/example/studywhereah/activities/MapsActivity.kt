@@ -179,7 +179,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             btn_save_location.setOnClickListener {
                 if (!saveBtnClicked) {
                     btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
-                    saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
+                    saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!,
+                        phoneNumber!!, operatingHours, hasFood!!, hasPort!!, imagesOfLocation)
                     saveBtnClicked = true
                 } //else {
 //                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
@@ -224,6 +225,12 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             latitudeOfLocation = intent.getDoubleExtra(Constants.LATITUDEOFLOCATION, 0.0)
             longitudeOfLocation = intent.getDoubleExtra(Constants.LONGITUDEOFLOCATION, 0.0)
             addressOfLocation = intent.getStringExtra(Constants.ADDRESSOFLOCATION)
+            phoneNumber = intent.getIntExtra(Constants.PHONENUMBER, 0)
+            operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
+            hasFood = intent.getBooleanExtra(Constants.FOODAVAILABLE, false)
+            hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
+            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
 
@@ -235,11 +242,42 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             // make the location details appear
             ll_location_details.visibility = View.VISIBLE
 
+            // set the TextViews to contain the results obtained from Google Places.
+            iv_location_detail1.setImageResource(imagesOfLocation[0])
+            iv_location_detail2.setImageResource(imagesOfLocation[1])
             tv_location_detail_name.text = nameOfLocation
 
             btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
 
             tv_location_detail_address.text = addressOfLocation
+
+            if (phoneNumber == -1) {
+                tv_location_detail_phone_number.text = "Not Available"
+            } else {
+                tv_location_detail_phone_number.text = phoneNumber.toString()
+            }
+            val openTime = operatingHours[0]
+            val closeTime = operatingHours[1]
+            val calObj = Calendar.getInstance()
+            val currTime = (calObj.get(Calendar.HOUR_OF_DAY) * 100) + (calObj.get(Calendar.MINUTE))
+            if (currTime in openTime until closeTime) {
+                //Opened!
+                tv_location_detail_openOrClose.text = "Open"
+            } else {
+                tv_location_detail_openOrClose.text = "Closed"
+                tv_location_detail_openOrClose.setTextColor(Color.RED)
+            }
+            tv_location_detail_operating_hours.text = "" + openTime + " to " + closeTime
+            if (hasFood!!) {
+                tv_location_detail_food_available.text = "Food options nearby"
+            } else {
+                tv_location_detail_food_available.text = "Sadly, no food nearby"
+            }
+            if (hasPort!!) {
+                tv_location_detail_charging_ports.text = "Charging ports available"
+            } else {
+                tv_location_detail_food_available.text = "Sadly, no charging ports"
+            }
 
         }
 
@@ -475,9 +513,10 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //        mMap.addMarker(MarkerOptions().position(location).title("Your current location"))
     }
 
-    private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double) {
+    private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double,
+                             phoneNum: Int, operatingHours: ArrayList<Int>, hasFood: Boolean, hasPort: Boolean, imagesOfLocation: ArrayList<Int>) {
         val dbHandler = SqliteOpenHelper(this, null)
-        val slm = SavedLocationModel(0, name, address, latitude, longitude)
+        val slm = SavedLocationModel(0, name, address, latitude, longitude, phoneNum, operatingHours, hasFood, hasPort, imagesOfLocation)
         val status = dbHandler.addLocation(slm)
         if (status > 0) {
             Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show()
