@@ -5,11 +5,13 @@ class LocationModel(
     private val address: String,
     private val latitude: Double,
     private val longitude: Double,
+    // distanceToUser default value is 0.0 until method
+    // calculateDistanceAndSetPropertyForAllLocations is called
     private var distanceToUser: Double,
     private var imageArrList: ArrayList<Int>,
-    private val phoneNum: Int,
-    private val operatingHours: ArrayList<Int>,
-    private val foodAvailable: Boolean,
+    private val phoneNum: Number,
+    private val operatingHours: ArrayList<Number>,
+    private val foodAvailable: String,
     private val chargingPorts: Boolean,
     private val crowdLevel: Int
 ) {
@@ -42,15 +44,15 @@ class LocationModel(
         this.distanceToUser = distance
     }
 
-    fun getPhoneNum() : Int {
+    fun getPhoneNum() : Number {
         return phoneNum
     }
 
-    fun getOperatingHours() : ArrayList<Int> {
+    fun getOperatingHours() : ArrayList<Number> {
         return operatingHours
     }
 
-    fun getFoodAvailable() : Boolean {
+    fun getFoodAvailable() : String {
         return foodAvailable
     }
 
@@ -58,6 +60,7 @@ class LocationModel(
         return chargingPorts
     }
 
+    // determines the current system time and estimates the crowd level.
     fun getCrowdLevel() : Int {
         return crowdLevel
     }

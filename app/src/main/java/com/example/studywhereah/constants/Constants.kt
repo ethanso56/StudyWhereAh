@@ -76,7 +76,7 @@ class Constants {
                 ),
                 -1,
                 ArrayList(listOf(1000, 2100)),
-                true,
+                "Have",
                 true,
                 timeToCrowd("library", formatDateCurrentTime)
             )
@@ -94,7 +94,7 @@ class Constants {
                 ),
                 63323255,
                 ArrayList(listOf(1000, 2100)),
-                true,
+                "HAVE",
                 true,
                 timeToCrowd("library", formatDateCurrentTime)
 
@@ -112,7 +112,7 @@ class Constants {
                 ,
                 -1,
                 ArrayList(listOf(1000, 2100)),
-                true,
+                "HHAVEVEE",
                 true,
                 timeToCrowd("library", formatDateCurrentTime)
             )

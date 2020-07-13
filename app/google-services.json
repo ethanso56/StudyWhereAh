@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "201605521340",
+    "firebase_url": "https://studywhereah-app-no-bill.firebaseio.com",
+    "project_id": "studywhereah-app-no-bill",
+    "storage_bucket": "studywhereah-app-no-bill.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201605521340:android:d683c33120cdfdca4a55b9",
+        "android_client_info": {
+          "package_name": "com.example.studywhereah"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201605521340-6cd72unn46kk07hm5phiq4ve98hj6ekc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAISP7z19wcQvuJvTe5OjP88L5ewFQx66s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "201605521340-6cd72unn46kk07hm5phiq4ve98hj6ekc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

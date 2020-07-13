@@ -19,8 +19,6 @@ class SqliteOpenHelper(
         factory, DATABASE_VERSION
     ) {
 
-
-
     override fun onCreate(db: SQLiteDatabase) {
         val CREATE_SAVED_LOCATIONS_TABLE = ("CREATE TABLE " + TABLE_SAVED_LOCATIONS +
                 "(" + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_NAME + " TEXT," + COLUMN_ADDRESS + " TEXT," +
@@ -33,6 +31,27 @@ class SqliteOpenHelper(
         onCreate(db) // Calls the onCreate function so all the updated table will be created.
     }
 
+    fun containsLocation(slm: SavedLocationModel): Boolean {
+        // address is used as the key for the data as it has the highest probability of being unique.
+        val slmAddress = slm.address
+        val query = "SELECT $COLUMN_ADDRESS FROM $TABLE_SAVED_LOCATIONS WHERE $COLUMN_ADDRESS = '$slmAddress'"
+        val db = this.readableDatabase
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(query, null)
+            Log.e("query message: ", query)
+            Log.e("Cursor Row Count: ", cursor.count.toString())
+        } catch (e: SQLiteException) {
+            db.execSQL(query)
+            return false
+        }
+        db.close()
+        return (cursor.count > 0)
+    }
+
+    // the method addLocation does not check if the locationModel to be added has been added before
+    // as the save location button checks for that before allowing the save button to be clicked.
     fun addLocation(slm: SavedLocationModel):Long {
         val values =
             ContentValues() // Creates an empty set of values using the default initial size

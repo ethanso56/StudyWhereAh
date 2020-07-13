@@ -36,6 +36,8 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -66,15 +68,15 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     // An ArrayList where operatingHours.get(0) is the opening time
     // and operatingHours.get(1) is the closing time
     private var operatingHours = ArrayList<Int>()
-    private var hasFood: Boolean? = null
+    private var hasFood: String? = null
     private var hasPort: Boolean? = null
     private var imagesOfLocation = ArrayList<Int>()
 
-    private var saveBtnClicked : Boolean = false
+//    private var saveBtnClicked : Boolean = true
+    private val dbHandler = SqliteOpenHelper(this, null)
 
-    //An ArrayList of locations that exist in our database.
-    // maybe change it to a hashtable?
-    private var curatedLocationList = Constants.getLocationList()
+    //Google Cloud Firestore instance
+//    private val fsInstance = Firebase.firestore
 
     //For the slide up panel
     private lateinit var bsb: BottomSheetBehavior<LinearLayout>
@@ -155,9 +157,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             addressOfLocation = intent.getStringExtra(Constants.ADDRESSOFLOCATION)
             phoneNumber = intent.getIntExtra(Constants.PHONENUMBER, 0)
             operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
-            hasFood = intent.getBooleanExtra(Constants.FOODAVAILABLE, false)
+            hasFood = intent.getStringExtra(Constants.FOODAVAILABLE)
             hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
             imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+            val slm = SavedLocationModel(0, nameOfLocation!!, addressOfLocation!!,
+                latitudeOfLocation!!, longitudeOfLocation!!)
 
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
@@ -176,11 +180,20 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             iv_location_detail2.setImageResource(imagesOfLocation.get(1))
             tv_location_detail_name.text = nameOfLocation
 
+            // initilize the btn_save_location background correctly
+            var locationSaved = dbHandler.containsLocation(slm)
+            if (locationSaved) {
+                btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
+//                saveBtnClicked = true
+            }
+
             btn_save_location.setOnClickListener {
-                if (!saveBtnClicked) {
+                // if the location we are looking at exists in SQLite Database
+                if (!locationSaved) {
+                    saveLocation(nameOfLocation!!, addressOfLocation!!,
+                        latitudeOfLocation!!, longitudeOfLocation!!)
+//                    saveBtnClicked = true
                     btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
-                    saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
-                    saveBtnClicked = true
                 } //else {
 //                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
 //                    deleteLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
@@ -207,11 +220,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 tv_location_detail_openOrClose.setTextColor(Color.RED)
             }
             tv_location_detail_operating_hours.text = "" + openTime + " to " + closeTime
-            if (hasFood!!) {
-                tv_location_detail_food_available.text = "Food options nearby"
-            } else {
-                tv_location_detail_food_available.text = "Sadly, no food nearby"
-            }
+
+                tv_location_detail_food_available.text = hasFood
+
+
+
             if (hasPort!!) {
                 tv_location_detail_charging_ports.text = "Charging ports available"
             } else {
@@ -295,9 +308,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             //make the layout padding_bottom correct
             tv_search.measure(0, 0)
             ll_button_row.measure(0, 0)
-            tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-                mMap.setPadding(0, tv_search.measuredHeight, 0, ll_button_row.measuredHeight)
-            }
+
+                mMap.setPadding(0, tv_search.measuredHeight + 60, 0, ll_button_row.measuredHeight)
+
             var place = Autocomplete.getPlaceFromIntent(data!!)
             var placeLatLng = place.latLng
             latitudeOfLocation = placeLatLng?.latitude
@@ -305,18 +318,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //            addressOfLocation = place.address
             nameOfLocation = place.name
 
-//            userRatingsTotal = place.userRatingsTotal
-//            phoneNumber = place.phoneNumber
-//
-//            ll_location_details.setVisibility(View.VISIBLE)
-//            // set the TextViews to contain the results obtained from Google Places.
-//            iv_location_detail1.setImageResource(curatedLocationList[1].getImages().get(0))
-//            iv_location_detail2.setImageResource(curatedLocationList[1].getImages().get(1))
-//            tv_location_detail_name.text = nameOfLocation
-//            tv_location_detail_rating.text = rating.toString()
-//            tv_location_ratings_total.text = userRatingsTotal.toString()
-//            tv_location_type.text = "LIBRARY (hardcoded)"
-//            tv_locationAddress.text = "Located at: " + latitudeOfLocation + ", " + longitudeOfLocation
+            //previously this area contained code to set up the swipe up bottomSheet.
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng!!, 15.0f))
             mMap.addMarker(MarkerOptions().position(placeLatLng!!))
@@ -363,9 +365,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 val operatingHoursHeightInPx = tv_location_detail_operating_hours.measuredHeight
                 val bottomPadding = hsvHeightInPx + placeNameHeightInPx +
                         openOrCloseHeightInPx + operatingHoursHeightInPx + buttonRowHeightInPx
-                mMap.setPadding(0, searchBarHeightInPx, 0, bottomPadding)
+                mMap.setPadding(0, searchBarHeightInPx + 60, 0, bottomPadding)
             } else {
-                mMap.setPadding(0, searchBarHeightInPx, 0, buttonRowHeightInPx)
+                mMap.setPadding(0, searchBarHeightInPx + 60, 0, buttonRowHeightInPx)
             }
         }
 
@@ -476,7 +478,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     }
 
     private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double) {
-        val dbHandler = SqliteOpenHelper(this, null)
         val slm = SavedLocationModel(0, name, address, latitude, longitude)
         val status = dbHandler.addLocation(slm)
         if (status > 0) {
@@ -485,7 +486,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     }
 
 //    private fun deleteLocation(name: String, address: String, latitude: Double, longitude: Double) {
-//        val dbHandler = SqliteOpenHelper(this, null)
 //        val slm = SavedLocationModel(1, name, address, latitude, longitude)
 //        val status = dbHandler.deleteLocation(slm)
 ////        Toast.makeText(this, "$status", Toast.LENGTH_SHORT).show()
