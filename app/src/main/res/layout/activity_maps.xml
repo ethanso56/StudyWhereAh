@@ -72,8 +72,9 @@
         android:id="@+id/btn_saved_locations"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginRight="15dp"
+        android:layout_gravity="right"
         android:background="@drawable/ic_bookmarks_24px"/>
 
 
@@ -90,24 +91,24 @@
             android:layout_width="match_parent"
             android:layout_height="110dp">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_images"
+                android:scrollbars="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
+<!--                <ImageView-->
+<!--                    android:id="@+id/iv_location_detail"-->
+<!--                    android:layout_width="196dp"-->
+<!--                    android:layout_height="110dp"-->
+<!--                    android:scaleType="fitXY"/>-->
 
-                <ImageView
-                    android:id="@+id/iv_location_detail1"
-                    android:layout_width="196dp"
-                    android:layout_height="110dp"
-                    android:scaleType="fitXY"/>
+<!--                <ImageView used to be 1 & 2, now im trying for adapter -->
+<!--                    android:id="@+id/iv_location_detail2"-->
+<!--                    android:layout_width="196dp"-->
+<!--                    android:layout_height="110dp"-->
+<!--                    android:scaleType="fitXY"/>-->
 
-                <ImageView
-                    android:id="@+id/iv_location_detail2"
-                    android:layout_width="196dp"
-                    android:layout_height="110dp"
-                    android:scaleType="fitXY"/>
-
-            </LinearLayout>
+            </androidx.recyclerview.widget.RecyclerView>
 
         </HorizontalScrollView>
 

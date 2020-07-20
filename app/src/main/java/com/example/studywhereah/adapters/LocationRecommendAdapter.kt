@@ -2,7 +2,10 @@ package com.example.studywhereah.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.location.Location
+import android.nfc.Tag
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +19,7 @@ import com.example.studywhereah.R
 import com.example.studywhereah.activities.MapsActivity
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.LocationModel
+import kotlinx.android.synthetic.main.activity_locations_recommended.view.*
 
 class LocationRecommendAdapter(
     context: Context, resource: Int,
@@ -38,9 +42,6 @@ class LocationRecommendAdapter(
         lateinit var oHours: TextView
         lateinit var imgView: ImageView
     }
-
-    // first we try using the position as the tag, to increase code efficiency.
-
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 //        return super.getView(position, convertView, parent)
@@ -85,9 +86,17 @@ class LocationRecommendAdapter(
         val openTime = operatingHours[0]
         val closeTime = operatingHours[1]
         viewHolder.oHours.setText("• Operating hours: " + openTime +" to " + closeTime)
-//        viewHolder.imgView.setImageResource(......)
+        //just take the first stored image
+        val PreviewImgTask = lModel.getPreviewImage()
+        PreviewImgTask.addOnSuccessListener { byteArr ->
+            Log.e("Success", "byteArrTaskSuccess")
+            var bitMap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
+            viewHolder.imgView.setImageBitmap(bitMap)
+        }
+        // the problem is in the drawable object. we need to use a bitmap or byte array.
+        Log.e("Success", "Passed listener as its asynchronou")
 //        viewHolder.title.setOnClickListener(this)
-        viewHolder.imgView.setTag(position)
+//        viewHolder.imgView.setTag(position)
 
         result.setOnClickListener(object: View.OnClickListener {
             override fun onClick(v: View?) {
@@ -98,7 +107,6 @@ class LocationRecommendAdapter(
                 intent.putExtra(Constants.LATITUDEOFLOCATION, lModel.getLatitude())
                 intent.putExtra(Constants.LONGITUDEOFLOCATION, lModel.getLongitude())
                 intent.putExtra(Constants.ADDRESSOFLOCATION, lModel.getAddress())
-                intent.putExtra(Constants.IMAGESOFLOCATION, lModel.getImages())
                 intent.putExtra(Constants.OPERATINGHOURS, lModel.getOperatingHours())
                 intent.putExtra(Constants.PHONENUMBER, lModel.getPhoneNum())
                 intent.putExtra(Constants.FOODAVAILABLE, lModel.getFoodAvailable())
@@ -107,7 +115,6 @@ class LocationRecommendAdapter(
                 intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
                 mContext.applicationContext.startActivity(intent)
             }
-
         })
 
         return result

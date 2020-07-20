@@ -24,7 +24,7 @@ class SqliteOpenHelper(
         val CREATE_SAVED_LOCATIONS_TABLE = ("CREATE TABLE " + TABLE_SAVED_LOCATIONS +
                 "(" + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_NAME + " TEXT," + COLUMN_ADDRESS + " TEXT," +
                 COLUMN_LATITUDE + " REAL," + COLUMN_LONGITUDE + " REAL," + COLUMN_PHONENUM + " INTEGER," +
-                COLUMN_HASFOOD + " INTEGER," + COLUMN_HASPORT + " INTEGER," + COLUMN_OPERATINGHOURS + " TEXT," +
+                COLUMN_HASFOOD + " TEXT," + COLUMN_HASPORT + " INTEGER," + COLUMN_OPERATINGHOURS + " TEXT," +
                 COLUMN_IMAGESOFLOCATION + " TEXT" + ")")// Create Saved locations Table Query.
         db.execSQL(CREATE_SAVED_LOCATIONS_TABLE)
     }
@@ -63,7 +63,7 @@ class SqliteOpenHelper(
         values.put(COLUMN_LATITUDE, slm.latitude)
         values.put(COLUMN_LONGITUDE, slm.longitude)
         values.put(COLUMN_PHONENUM, slm.phoneNum)
-        values.put(COLUMN_HASFOOD, if (slm.hasFood) 1 else 0)
+        values.put(COLUMN_HASFOOD, slm.hasFood)
         values.put(COLUMN_HASPORT, if (slm.hasPort) 1 else 0)
 
         val jsonOperatingHours = JSONObject()
@@ -115,7 +115,7 @@ class SqliteOpenHelper(
         var latitude: Double
         var longitude: Double
         var phoneNum: Int
-        var hasFood: Int
+        var hasFood: String
         var hasPort: Int
         var operatingHours: String
         var imagesOfLocation: String
@@ -128,7 +128,7 @@ class SqliteOpenHelper(
                 latitude = cursor.getDouble(cursor.getColumnIndex(COLUMN_LATITUDE))
                 longitude = cursor.getDouble(cursor.getColumnIndex(COLUMN_LONGITUDE))
                 phoneNum = cursor.getInt(cursor.getColumnIndex(COLUMN_PHONENUM))
-                hasFood = cursor.getInt(cursor.getColumnIndex(COLUMN_HASFOOD))
+                hasFood = cursor.getString(cursor.getColumnIndex(COLUMN_HASFOOD))
                 hasPort = cursor.getInt(cursor.getColumnIndex(COLUMN_HASPORT))
                 operatingHours = cursor.getString(cursor.getColumnIndex(COLUMN_OPERATINGHOURS))
                 imagesOfLocation = cursor.getString(cursor.getColumnIndex(COLUMN_IMAGESOFLOCATION))
@@ -152,7 +152,7 @@ class SqliteOpenHelper(
                 }
 
                 val slm = SavedLocationModel(id, name, address, latitude, longitude, phoneNum, operatingHoursList,
-                    hasFood == 1, hasPort == 1, imagesOfLocationList) //add the other properties into database
+                    hasFood, hasPort == 1, imagesOfLocationList) //add the other properties into database
                 slmList.add(slm)
             } while (cursor.moveToNext())
         }

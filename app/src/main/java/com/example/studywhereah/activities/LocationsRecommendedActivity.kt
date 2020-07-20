@@ -1,22 +1,30 @@
 package com.example.studywhereah.activities
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
 import com.example.studywhereah.R
 import com.example.studywhereah.adapters.LocationRecommendAdapter
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.LocationModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_locations_recommended.*
 import kotlinx.android.synthetic.main.activity_locations_recommended.toolbar_locations_recommended_activity
+import kotlinx.android.synthetic.main.activity_maps.*
+import java.net.URI
 import kotlin.math.*
 
 class LocationsRecommendedActivity : AppCompatActivity() {
@@ -26,8 +34,14 @@ class LocationsRecommendedActivity : AppCompatActivity() {
     var selectedLatitude : Double = 0.0
     var selectedLongitude : Double = 0.0
     var locationsList = ArrayList<LocationModel>()
+    // creating a variable collectionRef helps to cache the entire collection onCreate.
+    // meaning searches work offline.
     private val fsInstance = Firebase.firestore
     var collectionRef = fsInstance.collection("Study Spots")
+    // references for firebase cloud storage
+    var storage = com.google.firebase.storage.FirebaseStorage.getInstance()
+    var storageRef = storage.reference
+
     var maxTravelTime : Int = 0
     var crowdLevel : Int = 0
     var foodAvailable : Boolean = true
@@ -109,10 +123,36 @@ class LocationsRecommendedActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun recoLocation(foodAvail: Boolean, chargingPorts: Boolean,
                              maxTravelTime: Int, crowdLevel: Int) {
+        pb_firestore_loading.visibility = View.VISIBLE
         // use firebase's where() method which has query of time complexity O(num of results)
-        if (foodAvailable && chargingPorts) {
-            collectionRef.whereEqualTo("fAvail", true)
+        // problem is for fAvail i want to provide information apart from "true" but query
+        // is complicated.
+
+        fun retrieveLocationImages(placeName: String) {
+            var arrOfImages = ArrayList<Uri>()
+            var photoRetrievalIndex = 1
+            var path = "$placeName/$placeName $photoRetrievalIndex.jpg"
+//            var imageURI = storageRef
+//                .child("$placeName/$placeName $photoRetrievalIndex.jpg").downloadUrl
+            // add the imageURIs to the arrList
+            storageRef.child(path).listAll().addOnSuccessListener {
+                var listOfStorageRefs: List<StorageReference> = it.items
+                for (i in 0 until listOfStorageRefs.size-1 step 1) {
+                    listOfStorageRefs[i].downloadUrl.addOnSuccessListener { uriObj ->
+                        arrOfImages.add(uriObj)
+                    }
+                }
+            }
+
+            Log.e("path used: ", path)
+            Log.e("images $placeName", arrOfImages.toString())
+        }
+
+        if (foodAvail && chargingPorts) {
+            collectionRef.whereEqualTo("fAvail", "Study spot located in a mall")
                 .whereEqualTo("cPort", true).get().addOnSuccessListener { documents ->
+                    pb_firestore_loading.visibility = View.INVISIBLE
+                    tv_firebase_loading_msg.visibility = View.INVISIBLE
                     for (document in documents) {
                         val placeName = document.id
                         val address = document.get("address") as String
@@ -121,20 +161,21 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         val operatingHours= document.get("oHours") as ArrayList<Number>
                         val fAvail = document.get("fAvail") as String
                         val cPort = document.get("cPort") as Boolean
-                        //note that the images are set to a default as cloud storage is not set up yet
+                        // retrieve all available images using placeName.
+//                        retrieveLocationImages(placeName)
+
                         // crowdlevel 0 is low
+                        // imageArrList is set to null here and reSet later when sortedLocationsList
+                        // is fully initialised
                         var lModel = LocationModel(
                             placeName, address, coords.latitude, coords.longitude,
                             0.0,
-                            ArrayList(listOf(
-                                R.drawable.img_bedok_library1,
-                                R.drawable.img_bedok_library1)
-                            ), phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, 0)
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
 
-                    //CAN BE IMPROVED HAHA
+                    //******** Bottom two if chunks CAN BE IMPROVED maybe filter when querying and only add if satisfied.
                     if (maxTravelTime == 0) {
                         // remove all locations > 4km
                         locationsList.removeIf { it.getDistanceToUser() > 4 }
@@ -159,14 +200,39 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     sortedLocationsList =
                         ArrayList(locationsList.sortedWith(compareBy { it.getDistanceToUser() }))
 
+                    //only retrieve images after all processing is complete
+//                    for (i in 0 until sortedLocationsList.size step 1) {
+//                        var lModel = sortedLocationsList[i]
+//                        var imageUri = ""
+//                        var imagesArrList = ArrayList<Task<ByteArray>>()
+//                        var placeName = lModel.getName()
+//                        // we have designated placeName 2.png as the preview photo
+////                        var path = "$placeName/$placeName 2.png"
+//                        var allStorageRefs = storageRef.child(placeName.toString()).listAll()
+//
+//                        // maxDownloadSizeBytes = 300kb
+////                        var sr = storageRef.child(path).getBytes(300*1000)
+////                        imagesArrList.add(sr)
+//                        lModel.setImages(allStorageRefs)
+////                        Log.e("arr", lModel.getImages().toString())
+//                    }
+
+
                     val adapter = LocationRecommendAdapter(this,
                         R.layout.row_item, sortedLocationsList)
                     content_main_list_view.adapter = adapter
-
+                    if (sortedLocationsList.size == 0) {
+                        tv_fail_to_load.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.text = "We apologize as there are \nno suitable spots for you!"
+                    }
                 }
-        } else if (foodAvailable) {
-            collectionRef.whereEqualTo("fAvail", true)
+        } else if (foodAvail) {
+            // as "fAvail" is a string more values may exist.
+            collectionRef.whereEqualTo("fAvail", "Study spot located in a mall")
                 .get().addOnSuccessListener { documents ->
+                    pb_firestore_loading.visibility = View.INVISIBLE
+                    tv_firebase_loading_msg.visibility = View.INVISIBLE
                     for (document in documents) {
                         val placeName = document.id
                         val address = document.get("address") as String
@@ -179,10 +245,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            ArrayList(listOf(
-                                R.drawable.img_bedok_library1,
-                                R.drawable.img_bedok_library1)
-                            ), phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, 0)
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -214,11 +277,18 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     val adapter = LocationRecommendAdapter(this,
                         R.layout.row_item, sortedLocationsList)
                     content_main_list_view.adapter = adapter
+                    if (sortedLocationsList.size == 0) {
+                        tv_fail_to_load.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.text = "We apologize as there are no suitable spots for you!"
+                    }
 
                 }
         } else if (chargingPorts) {
             collectionRef.whereEqualTo("cPort", true)
                 .get().addOnSuccessListener { documents ->
+                    pb_firestore_loading.visibility = View.INVISIBLE
+                    tv_firebase_loading_msg.visibility = View.INVISIBLE
                     for (document in documents) {
                         val placeName = document.id
                         val address = document.get("address") as String
@@ -231,10 +301,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            ArrayList(listOf(
-                                R.drawable.img_bedok_library1,
-                                R.drawable.img_bedok_library1)
-                            ), phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, 0)
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -266,11 +333,18 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     val adapter = LocationRecommendAdapter(this,
                         R.layout.row_item, sortedLocationsList)
                     content_main_list_view.adapter = adapter
+                    if (sortedLocationsList.size == 0) {
+                        tv_fail_to_load.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.text = "We apologize as there are no suitable spots for you!"
+                    }
                 }
         } else {
             //return all locations
             collectionRef.get()
                 .addOnSuccessListener { documents ->
+                    pb_firestore_loading.visibility = View.INVISIBLE
+                    tv_firebase_loading_msg.visibility = View.INVISIBLE
                     for (document in documents) {
                         val placeName = document.id
                         val address = document.get("address") as String
@@ -283,10 +357,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            ArrayList(listOf(
-                                R.drawable.img_bedok_library1,
-                                R.drawable.img_bedok_library1)
-                            ), phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, 0)
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -318,6 +389,12 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     val adapter = LocationRecommendAdapter(applicationContext,
                         R.layout.row_item, sortedLocationsList)
                     content_main_list_view.adapter = adapter
+
+                    if (sortedLocationsList.size == 0) {
+                        tv_fail_to_load.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.visibility = View.VISIBLE
+                        tv_firebase_loading_msg.text = "We apologize as there are no suitable spots for you!"
+                    }
                 }
         }
     }

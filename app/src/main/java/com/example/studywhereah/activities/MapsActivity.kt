@@ -5,6 +5,9 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
@@ -13,12 +16,16 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.studywhereah.R
+import com.example.studywhereah.adapters.ImageViewsAdapter
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.SavedLocationModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -30,6 +37,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -38,6 +46,9 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ListResult
+import com.google.firebase.storage.StorageReference
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -75,8 +86,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 //    private var saveBtnClicked : Boolean = true
     private val dbHandler = SqliteOpenHelper(this, null)
 
-    //Google Cloud Firestore instance
-//    private val fsInstance = Firebase.firestore
+    //Firebase storage instance
+    private var storage = FirebaseStorage.getInstance()
+    private var storageRef = storage.reference
 
     //For the slide up panel
     private lateinit var bsb: BottomSheetBehavior<LinearLayout>
@@ -129,7 +141,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         tv_location_detail_openOrClose.measure(0,0)
         tv_location_detail_operating_hours.measure(0, 0)
         btn_get_place1.measure(0, 0)
-        val hsvHeightInPx = hsv_location_images.measuredHeight
+        val displayDensity = resources.displayMetrics.densityDpi
+        val hsvHeightInPx = 110 * (displayDensity/160)
         val placeNameHeightInPx = tv_location_detail_name.measuredHeight
         val getPlaceBtnHeightInPx = btn_get_place1.measuredHeight
         val peekHeight = hsvHeightInPx + placeNameHeightInPx + getPlaceBtnHeightInPx
@@ -150,7 +163,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
         // coming from LocationsRecommendedActivity
         if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
-
+            // when called from locationsRecActvity, we load the images from the web.
             nameOfLocation = intent.getStringExtra(Constants.NAMEOFLOCATION)
             latitudeOfLocation = intent.getDoubleExtra(Constants.LATITUDEOFLOCATION, 0.0)
             longitudeOfLocation = intent.getDoubleExtra(Constants.LONGITUDEOFLOCATION, 0.0)
@@ -159,9 +172,39 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
             hasFood = intent.getStringExtra(Constants.FOODAVAILABLE)
             hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
-            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+//            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
             val slm = SavedLocationModel(0, nameOfLocation!!, addressOfLocation!!,
-                latitudeOfLocation!!, longitudeOfLocation!!)
+                latitudeOfLocation!!, longitudeOfLocation!!, phoneNumber!!, operatingHours!!,
+            hasFood!!, hasPort!!, imagesOfLocation!!)
+            //imagesOfLocation does nothing here
+
+            var listResultTask = getImagesTask()
+            listResultTask.addOnSuccessListener { listResult ->
+                var list = listResult.items
+                var storageRefArrList = ArrayList<StorageReference>()
+
+                for (i in 0 until list.size step 1) {
+                    storageRefArrList.add(list.get(i))
+                }
+                var layoutManager = LinearLayoutManager(this,
+                    LinearLayoutManager.HORIZONTAL, false)
+                var adapter = ImageViewsAdapter(storageRefArrList)
+
+                rv_images.layoutManager = layoutManager
+                rv_images.adapter = adapter
+//                    var task = list[i].getBytes(350*1000)
+//                    task.addOnSuccessListener { byteArr ->
+//                        var bitmap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
+//                        var imgView = ImageView(this)
+//                        imgView.scaleType = ImageView.ScaleType.FIT_XY
+//                        imgView.maxWidth = 500
+//                        imgView.setImageBitmap(bitmap)
+//                        ll_images.addView(imgView)
+
+//                    storageRefArrList.add(list[i])
+
+            }
+
 
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
@@ -176,8 +219,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             ll_location_details.visibility = View.VISIBLE
 
             // set the TextViews to contain the results obtained from Google Places.
-            iv_location_detail1.setImageResource(imagesOfLocation[0])
-            iv_location_detail2.setImageResource(imagesOfLocation[1])
+//            iv_location_detail1.setImageResource(imagesOfLocation[0])
+//            iv_location_detail2.setImageResource(imagesOfLocation[1])
             tv_location_detail_name.text = nameOfLocation
 
             // initilize the btn_save_location background correctly
@@ -190,13 +233,10 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             btn_save_location.setOnClickListener {
                 // if the location we are looking at exists in SQLite Database
                 if (!locationSaved) {
-                    saveLocation(nameOfLocation!!, addressOfLocation!!,
-                        latitudeOfLocation!!, longitudeOfLocation!!)
 //                    saveBtnClicked = true
                     btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
                     saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!,
                         phoneNumber!!, operatingHours, hasFood!!, hasPort!!, imagesOfLocation)
-                    saveBtnClicked = true
                 } //else {
 //                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
 //                    deleteLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
@@ -223,11 +263,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 tv_location_detail_openOrClose.setTextColor(Color.RED)
             }
             tv_location_detail_operating_hours.text = "" + openTime + " to " + closeTime
-            if (hasFood!!) {
-                tv_location_detail_food_available.text = "Food options nearby"
-            } else {
-                tv_location_detail_food_available.text = "Sadly, no food nearby"
-            }
+            tv_location_detail_food_available.text = hasFood
+
             if (hasPort!!) {
                 tv_location_detail_charging_ports.text = "Charging ports available"
             } else {
@@ -242,9 +279,36 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             addressOfLocation = intent.getStringExtra(Constants.ADDRESSOFLOCATION)
             phoneNumber = intent.getIntExtra(Constants.PHONENUMBER, 0)
             operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
-            hasFood = intent.getBooleanExtra(Constants.FOODAVAILABLE, false)
+            hasFood = intent.getStringExtra(Constants.FOODAVAILABLE)
             hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
-            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+//            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
+
+            var listResultTask = getImagesTask()
+            listResultTask.addOnSuccessListener { listResult ->
+                var list = listResult.items
+                var storageRefArrList = ArrayList<StorageReference>()
+
+                for (i in 0 until list.size step 1) {
+                    storageRefArrList.add(list.get(i))
+                }
+                var layoutManager = LinearLayoutManager(this,
+                    LinearLayoutManager.HORIZONTAL, false)
+                var adapter = ImageViewsAdapter(storageRefArrList)
+
+                rv_images.layoutManager = layoutManager
+                rv_images.adapter = adapter
+//                    var task = list[i].getBytes(350*1000)
+//                    task.addOnSuccessListener { byteArr ->
+//                        var bitmap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
+//                        var imgView = ImageView(this)
+//                        imgView.scaleType = ImageView.ScaleType.FIT_XY
+//                        imgView.maxWidth = 500
+//                        imgView.setImageBitmap(bitmap)
+//                        ll_images.addView(imgView)
+
+//                    storageRefArrList.add(list[i])
+
+            }
 
             selectedLatitude = latitudeOfLocation as Double
             selectedLongitude = longitudeOfLocation as Double
@@ -258,8 +322,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             ll_location_details.visibility = View.VISIBLE
 
             // set the TextViews to contain the results obtained from Google Places.
-            iv_location_detail1.setImageResource(imagesOfLocation[0])
-            iv_location_detail2.setImageResource(imagesOfLocation[1])
+//            iv_location_detail1.setImageResource(imagesOfLocation[0])
+//            iv_location_detail2.setImageResource(imagesOfLocation[1])
             tv_location_detail_name.text = nameOfLocation
 
             btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
@@ -285,7 +349,6 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             tv_location_detail_operating_hours.text = "" + openTime + " to " + closeTime
 
                 tv_location_detail_food_available.text = hasFood
-
 
 
             if (hasPort!!) {
@@ -330,6 +393,12 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             mapIntent.setPackage("com.google.android.apps.maps")
             startActivity(mapIntent)
         }
+    }
+
+    // method to query images for current location from firebase storage
+    fun getImagesTask() : Task<ListResult> {
+        var queryPath = nameOfLocation.toString()
+        return storageRef.child(queryPath).listAll()
     }
 
 //    private fun addPointToViewPort(newPoint: LatLng) {
@@ -387,6 +456,23 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         mMap.isMyLocationEnabled = true
         //code below is to set the padding of the "interactable" portion of the map :)
         tv_search.measure(0, 0)
@@ -394,7 +480,8 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
         val searchBarHeightInPx = tv_search.measuredHeight
         val buttonRowHeightInPx = ll_button_row.measuredHeight
         tv_search.viewTreeObserver.addOnGlobalLayoutListener {
-            if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity") {
+            if (intent.getStringExtra("CALLINGACTIVITY") == "LocationsRecommendedActivity" ||
+                intent.getStringExtra("CALLINGACTIVITY") == "SavedLocationsActivity") {
                 hsv_location_images.measure(0,0)
                 tv_location_detail_name.measure(0, 0)
                 tv_location_detail_openOrClose.measure(0,0)
@@ -499,6 +586,23 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     }
 
     private fun requestNewLocationData() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
         mFusedLocationClient.lastLocation
             .addOnSuccessListener { location : Location? ->
                 updateMapLocation(location)
@@ -518,7 +622,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     }
 
     private fun saveLocation(name: String, address: String, latitude: Double, longitude: Double,
-                             phoneNum: Int, operatingHours: ArrayList<Int>, hasFood: Boolean, hasPort: Boolean, imagesOfLocation: ArrayList<Int>) {
+                             phoneNum: Int, operatingHours: ArrayList<Int>, hasFood: String, hasPort: Boolean, imagesOfLocation: ArrayList<Int>) {
         val dbHandler = SqliteOpenHelper(this, null)
         val slm = SavedLocationModel(0, name, address, latitude, longitude, phoneNum, operatingHours, hasFood, hasPort, imagesOfLocation)
         val status = dbHandler.addLocation(slm)

@@ -5,6 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.LocationsRecommendedActivity">
+    
+    <ProgressBar
+        android:id="@+id/pb_firestore_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/tv_fail_to_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        android:background="@drawable/ic_sentiment_very_dissatisfied_purple"/>
+
+    <TextView
+        android:id="@+id/tv_firebase_loading_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pb_firestore_loading"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Recommendations coming your way!"/>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_locations_recommended_activity"

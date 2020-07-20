@@ -24,7 +24,7 @@ class SavedLocationsActivity : AppCompatActivity() {
     // An ArrayList where operatingHours.get(0) is the opening time
     // and operatingHours.get(1) is the closing time
     private var operatingHours = ArrayList<Int>()
-    private var hasFood: Boolean? = null
+    private var hasFood: String? = null
     private var hasPort: Boolean? = null
     private var imagesOfLocation = ArrayList<Int>()
 

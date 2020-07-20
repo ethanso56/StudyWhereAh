@@ -1,13 +1,17 @@
 package com.example.studywhereah.constants
 
+import android.graphics.drawable.Drawable
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.studywhereah.R
 import com.example.studywhereah.models.LocationModel
+import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.OpeningHours
+import com.google.firebase.storage.ListResult
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Arrays.asList
@@ -70,10 +74,6 @@ class Constants {
                 1.314942,
                 103.764027,
                 0.0,
-                ArrayList(
-                    listOf(R.drawable.img_clementi_library1,
-                        R.drawable.img_clementi_library2)
-                ),
                 -1,
                 ArrayList(listOf(1000, 2100)),
                 "Have",
@@ -88,10 +88,6 @@ class Constants {
                 1.327179,
                 103.931762,
                 0.0,
-                ArrayList(listOf(
-                R.drawable.img_bedok_library1,
-                R.drawable.img_bedok_library1)
-                ),
                 63323255,
                 ArrayList(listOf(1000, 2100)),
                 "HAVE",
@@ -107,9 +103,6 @@ class Constants {
                 1.429656,
                 103.835770,
                 0.0,
-                ArrayList(listOf(R.drawable.img_yishun_library3,
-                    R.drawable.img_yishun_library2))
-                ,
                 -1,
                 ArrayList(listOf(1000, 2100)),
                 "HHAVEVEE",
