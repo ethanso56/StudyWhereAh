@@ -17,7 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SavedLocationsActivity"></activity>
+        <activity android:name=".activities.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+        <activity android:name=".activities.SavedLocationsActivity" />
         <activity
             android:name=".activities.LocationDetailsActivity"
             android:screenOrientation="portrait"
@@ -46,11 +56,7 @@
             android:name=".activities.MapsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CustomNoActionBarTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
