@@ -14,12 +14,14 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -28,6 +30,8 @@ import com.example.studywhereah.R
 import com.example.studywhereah.adapters.ImageViewsAdapter
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.SavedLocationModel
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -44,6 +48,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -91,11 +96,37 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var storageRef = storage.reference
 
     //For the slide up panel
-    private lateinit var bsb: BottomSheetBehavior<LinearLayout>
+    private lateinit var bsb: BottomSheetBehavior<ConstraintLayout>
+
+    private var currentUser = FirebaseAuth.getInstance().currentUser
+    private var RC_SIGN_IN = 10001
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+
+//        if (currentUser == null) {
+//            // start login activity
+//            var providers = arrayListOf<AuthUI.IdpConfig>(
+//                AuthUI.IdpConfig.EmailBuilder().build(), AuthUI.IdpConfig.GoogleBuilder().build()
+//            )
+//
+//            startActivityForResult(
+//                AuthUI.getInstance()
+//                    .createSignInIntentBuilder()
+//                    .setAvailableProviders(providers)
+//                    .build(),
+//                RC_SIGN_IN)
+//        }
+
+//        if (currentUser == null) {
+//            var intent = Intent(this, LoginRegisterActivity::class.java)
+//            startActivity(intent)
+//            this.finish()
+//        }
+
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
@@ -387,11 +418,33 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             startActivity(intent)
         }
 
+        btn_profile_page.setOnClickListener{
+            val intent = Intent(this, UserProfile::class.java)
+            startActivity(intent)
+        }
+
         btn_navigate_here.setOnClickListener {
             val gmmIntentUri: Uri = Uri.parse("google.navigation:q=$latitudeOfLocation, $longitudeOfLocation")
             val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
             mapIntent.setPackage("com.google.android.apps.maps")
             startActivity(mapIntent)
+        }
+    }
+
+    fun startLoginIntent() {
+        if (currentUser == null) {
+            // start login activity
+            var providers = arrayListOf<AuthUI.IdpConfig>(
+                AuthUI.IdpConfig.EmailBuilder().build(),
+                AuthUI.IdpConfig.GoogleBuilder().build()
+            )
+
+            startActivityForResult(
+                AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setAvailableProviders(providers)
+                    .build(),
+                RC_SIGN_IN)
         }
     }
 
@@ -441,6 +494,29 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             var status = Autocomplete.getStatusFromIntent(data!!)
             Toast.makeText(applicationContext, status.statusMessage
             , Toast.LENGTH_SHORT).show()
+        } else if (requestCode == RC_SIGN_IN) {
+            if (resultCode == Activity.RESULT_OK) {
+                var user = FirebaseAuth.getInstance().currentUser
+                Log.e("User email", user?.email)
+                if (user?.metadata?.creationTimestamp == user?.metadata?.lastSignInTimestamp) {
+                    //new user
+                    Toast.makeText(this, "Congrats you have just signed up!", Toast.LENGTH_SHORT)
+                } else {
+                    Toast.makeText(this, "Welcome back Mugger!", Toast.LENGTH_SHORT)
+                }
+                var intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
+                this.finish()
+            } else {
+                // sign in failed
+                var idpResponse = IdpResponse.fromResultIntent(data)
+                if (idpResponse == null) {
+                    Log.e("Cancelled", "User has cancelled sign in request")
+                } else {
+                    // we dk so we log the error
+                    Log.e("Error", idpResponse.error?.message)
+                }
+            }
         }
     }
 
