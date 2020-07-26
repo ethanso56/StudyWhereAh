@@ -17,6 +17,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".activities.AddLocationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".activities.UserProfile"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.UpdateProfileActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".activities.SavedLocationsActivity"></activity>
         <activity
             android:name=".activities.LocationDetailsActivity"
