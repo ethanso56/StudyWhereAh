@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
 import com.example.studywhereah.models.SavedLocationModel
+import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -19,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import kotlinx.android.synthetic.main.activity_add_location_activity.*
+import kotlinx.android.synthetic.main.activity_sign_in_first.*
 
 
 class AddLocationActivity: AppCompatActivity() {
@@ -34,6 +37,9 @@ class AddLocationActivity: AppCompatActivity() {
     private var fireStoreInstance = Firebase.firestore
     private var collectionNameToStoreIn = "Study Spots"
 
+    private var currentUser = FirebaseAuth.getInstance().currentUser
+    private var RC_SIGN_IN = 10001
+
     private val SELECT_LOCATION_CODE = 112
     private val PICK_IMAGE = 1
     // as of now only a single image can be uploaded
@@ -48,97 +54,113 @@ class AddLocationActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_location_activity)
+        if (currentUser == null) {
+            //not logged in
+            setContentView(R.layout.activity_sign_in_first)
+            setSupportActionBar(toolbar_user_profile_sign_in_first)
+            var actionbar = supportActionBar
+            if (actionbar != null) {
+                actionbar.setDisplayHomeAsUpEnabled(true) //set back button
+                actionbar.title = "Profile"
+            }
+            btn_sign_in.setOnClickListener{
+                startLoginIntent()
+                this.finish()
+            }
+        } else {
+            setContentView(R.layout.activity_add_location_activity)
+            setSupportActionBar(toolbar_add_location_activity)
+            var actionbar = supportActionBar
+            if (actionbar != null) {
+                actionbar.setDisplayHomeAsUpEnabled(true) //set back button
+                actionbar.title = "Add Location"
+            }
 
-        setSupportActionBar(toolbar_add_location_activity)
-        var actionbar = supportActionBar
-        if (actionbar != null) {
-            actionbar.setDisplayHomeAsUpEnabled(true) //set back button
-            actionbar.title = "Add Location"
-        }
+            toolbar_add_location_activity.setNavigationOnClickListener {
+                onBackPressed()
+            }
 
-        toolbar_add_location_activity.setNavigationOnClickListener {
-            onBackPressed()
-        }
+            btn_choose_from_gallery.setOnClickListener {
+                val intent = Intent()
+                intent.type = "image/*"
+                intent.action = Intent.ACTION_GET_CONTENT
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE)
+            }
 
-        btn_choose_from_gallery.setOnClickListener {
-            val intent = Intent()
-            intent.type = "image/*"
-            intent.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE)
-        }
+            tv_select_on_map.setOnClickListener {
+                var intent = Intent(this, MapsActivity::class.java)
+                intent.putExtra("CALLINGACTIVITY", "AddLocationActivity")
+                // retain user inputs
+                startActivityForResult(intent, SELECT_LOCATION_CODE)
+            }
 
-        tv_select_on_map.setOnClickListener {
-            var intent = Intent(this, MapsActivity::class.java)
-            intent.putExtra("CALLINGACTIVITY", "AddLocationActivity")
-            // retain user inputs
-            startActivityForResult(intent, SELECT_LOCATION_CODE)
-        }
+            btn_proceed_add_location.setOnClickListener {
 
-        btn_proceed_add_location.setOnClickListener {
+                placeName = input_place_name.text.toString()
+                hasPort = checkbox_charge_ports.isChecked
+                hasFood = input_food_avail.text.toString()
+                specialInfo = input_special_info.text.toString()
 
-            placeName = input_place_name.text.toString()
-            hasPort = checkbox_charge_ports.isChecked
-            hasFood = input_food_avail.text.toString()
-            specialInfo = input_special_info.text.toString()
+                if (selectedLat == null || selectedLng == null) {
+                    Toast.makeText(this, "Please select a location before proceeding", Toast.LENGTH_LONG).show()
+                } else if (placeName == null) {
+                    Toast.makeText(this, "Please give your spot a name", Toast.LENGTH_LONG).show()
+                } else if (checkbox_save_to_device.isChecked && checkbox_upload_to_database.isChecked) {
+                    if (imageToUpload == null) {
+                        Toast.makeText(this,
+                            "Please select an image to upload",
+                            Toast.LENGTH_SHORT).show()
+                    } else {
+                        saveLocation(
+                            placeName!!,"", selectedLat!!, selectedLng!!, -1,
+                            arrayListOf(-1, -1), hasFood!!, hasPort!!, ArrayList<Int>())
+                        uploadImage()
+                        uploadToFirestore(placeName!!,
+                            hasPort!!, hasFood!!, selectedLat!!, selectedLng!!, specialInfo!!
+                        )
+                        Log.e("WHY", "Both complete")
+                    }
 
-            if (selectedLat == null || selectedLng == null) {
-                Toast.makeText(this, "Please select a location before proceeding", Toast.LENGTH_LONG).show()
-            } else if (placeName == null) {
-                Toast.makeText(this, "Please give your spot a name", Toast.LENGTH_LONG).show()
-            } else if (checkbox_save_to_device.isChecked && checkbox_upload_to_database.isChecked) {
-                if (imageToUpload == null) {
-                    Toast.makeText(this,
-                        "Please select an image to upload",
-                        Toast.LENGTH_SHORT).show()
-                } else {
+                } else if (checkbox_save_to_device.isChecked) {
+
                     saveLocation(
                         placeName!!,"", selectedLat!!, selectedLng!!, -1,
                         arrayListOf(-1, -1), hasFood!!, hasPort!!, ArrayList<Int>())
-                    uploadImage()
-                    uploadToFirestore(placeName!!,
-                        hasPort!!, hasFood!!, selectedLat!!, selectedLng!!, specialInfo!!
-                    )
-                    Log.e("WHY", "Both complete")
-                }
 
-            } else if (checkbox_save_to_device.isChecked) {
+                } else if (checkbox_upload_to_database.isChecked) {
+                    if (imageToUpload == null) {
+                        Toast.makeText(this,
+                            "Please select an image to upload",
+                            Toast.LENGTH_SHORT).show()
+                    } else {
+                        placeName = input_place_name.text.toString()
+                        val hasPort = checkbox_charge_ports.isChecked
+                        val hasFood = input_food_avail.text.toString()
+                        val specialInfo = input_special_info.text.toString()
+                        uploadImage()
+                        uploadToFirestore(placeName!!, hasPort, hasFood, selectedLat!!, selectedLng!!, specialInfo)
+                    }
 
-                saveLocation(
-                    placeName!!,"", selectedLat!!, selectedLng!!, -1,
-                arrayListOf(-1, -1), hasFood!!, hasPort!!, ArrayList<Int>())
-
-            } else if (checkbox_upload_to_database.isChecked) {
-                if (imageToUpload == null) {
-                    Toast.makeText(this,
-                        "Please select an image to upload",
-                        Toast.LENGTH_SHORT).show()
                 } else {
-                    placeName = input_place_name.text.toString()
-                    val hasPort = checkbox_charge_ports.isChecked
-                    val hasFood = input_food_avail.text.toString()
-                    val specialInfo = input_special_info.text.toString()
-                    uploadImage()
-                    uploadToFirestore(placeName!!, hasPort, hasFood, selectedLat!!, selectedLng!!, specialInfo)
+
+                    Toast.makeText(
+                        this,
+                        "You need to Save to device or Share Location to proceed",
+                        Toast.LENGTH_LONG
+                    ).show()
+
                 }
 
-            } else {
-
-                Toast.makeText(
-                    this,
-                    "You need to Save to device or Share Location to proceed",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            }
-
-            Tasks.whenAll(imageUploadTask, firestoreTask).addOnSuccessListener {
-                if (locationSaved!!) {
-                    this.finish()
+                Tasks.whenAll(imageUploadTask, firestoreTask).addOnSuccessListener {
+                    if (locationSaved!!) {
+                        this.finish()
+                    }
                 }
-            }
 
+            }
         }
+
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -201,5 +223,24 @@ class AddLocationActivity: AppCompatActivity() {
             }
         }
 
+    }
+
+    fun startLoginIntent() {
+        if (currentUser == null) {
+            // start login activity
+            var providers = arrayListOf<AuthUI.IdpConfig>(
+                AuthUI.IdpConfig.EmailBuilder().build(),
+                AuthUI.IdpConfig.GoogleBuilder().build()
+            )
+
+            startActivityForResult(
+                AuthUI.getInstance()
+                    .createSignInIntentBuilder()
+                    .setIsSmartLockEnabled(false)
+                    .setLogo(R.drawable.books)
+                    .setAvailableProviders(providers)
+                    .build(),
+                RC_SIGN_IN)
+        }
     }
 }
