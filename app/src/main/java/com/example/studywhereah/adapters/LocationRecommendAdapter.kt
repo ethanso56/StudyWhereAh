@@ -111,6 +111,7 @@ class LocationRecommendAdapter(
                 intent.putExtra(Constants.PHONENUMBER, lModel.getPhoneNum())
                 intent.putExtra(Constants.FOODAVAILABLE, lModel.getFoodAvailable())
                 intent.putExtra(Constants.CHARGINGPORTS, lModel.getChargingPorts())
+                intent.putExtra(Constants.SPECIALINFO, lModel.getSpecialInfo())
                 //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
                 intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
                 mContext.applicationContext.startActivity(intent)

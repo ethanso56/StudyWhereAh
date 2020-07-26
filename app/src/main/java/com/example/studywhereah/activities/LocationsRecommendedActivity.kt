@@ -25,6 +25,8 @@ import kotlinx.android.synthetic.main.activity_locations_recommended.*
 import kotlinx.android.synthetic.main.activity_locations_recommended.toolbar_locations_recommended_activity
 import kotlinx.android.synthetic.main.activity_maps.*
 import java.net.URI
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.*
 
 class LocationsRecommendedActivity : AppCompatActivity() {
@@ -116,6 +118,21 @@ class LocationsRecommendedActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun returnCrowdLevelEstimate() : Int {
+        val currentTime: LocalDateTime = LocalDateTime.now()
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH")
+        val formatDateCurrentTime: String = currentTime.format(Constants.formatter)
+        val timeInInt : Int = formatDateCurrentTime.toInt()
+        if (timeInInt < 10) {
+            return 0 // "low" level
+        } else if (timeInInt < 12 || timeInInt > 18) {
+            return 1 // "mid" level
+        } else {
+            return 2 // "high" level
+        }
+    }
+
     // based on the set user preferences, queries cloud firestore with the filters and
     // creates locationModel objects to be stored in the locationsList arraylist.
 
@@ -161,6 +178,13 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         val operatingHours= document.get("oHours") as ArrayList<Number>
                         val fAvail = document.get("fAvail") as String
                         val cPort = document.get("cPort") as Boolean
+                        val sInfo = document.get("specialInfo") as String?
+                        val specialInfo : String
+                        if (sInfo == null) {
+                            specialInfo = ""
+                        } else {
+                            specialInfo = sInfo
+                        }
                         // retrieve all available images using placeName.
 //                        retrieveLocationImages(placeName)
 
@@ -170,7 +194,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         var lModel = LocationModel(
                             placeName, address, coords.latitude, coords.longitude,
                             0.0,
-                            phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, specialInfo, returnCrowdLevelEstimate())
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -241,11 +265,17 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         val operatingHours= document.get("oHours") as ArrayList<Number>
                         val fAvail = document.get("fAvail") as String
                         val cPort = document.get("cPort") as Boolean
-                        //note that the images are set to a default as cloud storage is not set up yet
+                        val sInfo = document.get("specialInfo") as String?
+                        val specialInfo : String
+                        if (sInfo == null) {
+                            specialInfo = ""
+                        } else {
+                            specialInfo = sInfo
+                        }
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, specialInfo, returnCrowdLevelEstimate())
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -297,11 +327,18 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         val operatingHours= document.get("oHours") as ArrayList<Number>
                         val fAvail = document.get("fAvail") as String
                         val cPort = document.get("cPort") as Boolean
+                        val sInfo = document.get("specialInfo") as String?
+                        val specialInfo : String
+                        if (sInfo == null) {
+                            specialInfo = ""
+                        } else {
+                            specialInfo = sInfo
+                        }
                         //note that the images are set to a default as cloud storage is not set up yet
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, specialInfo, returnCrowdLevelEstimate())
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
@@ -353,11 +390,18 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         val operatingHours= document.get("oHours") as ArrayList<Number>
                         val fAvail = document.get("fAvail") as String
                         val cPort = document.get("cPort") as Boolean
+                        val sInfo = document.get("specialInfo") as String?
+                        val specialInfo : String
+                        if (sInfo == null) {
+                            specialInfo = ""
+                        } else {
+                            specialInfo = sInfo
+                        }
                         //note that the images are set to a default as cloud storage is not set up yet
                         // crowdlevel 0 is low
                         var lModel = LocationModel(placeName, address, coords.latitude,
                             coords.longitude, 0.0,
-                            phoneNumber, operatingHours, fAvail, cPort, 0)
+                            phoneNumber, operatingHours, fAvail, cPort, specialInfo, returnCrowdLevelEstimate())
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)

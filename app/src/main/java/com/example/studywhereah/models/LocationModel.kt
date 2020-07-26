@@ -18,6 +18,7 @@ class LocationModel(
     private val operatingHours: ArrayList<Number>,
     private val foodAvailable: String,
     private val chargingPorts: Boolean,
+    private val specialInfo: String,
     private val crowdLevel: Int
 ) {
 
@@ -78,6 +79,10 @@ class LocationModel(
 
     fun getChargingPorts() : Boolean {
         return chargingPorts
+    }
+
+    fun getSpecialInfo() : String {
+        return specialInfo
     }
 
     // determines the current system time and estimates the crowd level.

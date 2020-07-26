@@ -40,6 +40,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.Places
@@ -63,7 +64,7 @@ import java.nio.DoubleBuffer
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapReadyCallback {
+class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapReadyCallback{
 
     private lateinit var mMap: GoogleMap
     private var mBounds: LatLngBounds.Builder = LatLngBounds.Builder()
@@ -86,6 +87,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var operatingHours = ArrayList<Int>()
     private var hasFood: String? = null
     private var hasPort: Boolean? = null
+    private var specialInfo: String? = null
     private var imagesOfLocation = ArrayList<Int>()
 
 //    private var saveBtnClicked : Boolean = true
@@ -101,6 +103,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private var RC_SIGN_IN = 10001
 
+    private var latToSave: Double? = null
+    private var lngToSave: Double? = null
+    private var markerForAddPlace: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,6 +208,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             operatingHours = intent.getIntegerArrayListExtra(Constants.OPERATINGHOURS)!!
             hasFood = intent.getStringExtra(Constants.FOODAVAILABLE)
             hasPort = intent.getBooleanExtra(Constants.CHARGINGPORTS, false)
+            specialInfo = intent.getStringExtra(Constants.SPECIALINFO)
 //            imagesOfLocation = intent.getIntegerArrayListExtra(Constants.IMAGESOFLOCATION)!!
             val slm = SavedLocationModel(0, nameOfLocation!!, addressOfLocation!!,
                 latitudeOfLocation!!, longitudeOfLocation!!, phoneNumber!!, operatingHours!!,
@@ -301,6 +307,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             } else {
                 tv_location_detail_food_available.text = "Sadly, no charging ports"
             }
+            tv_location_special_instructions.text = specialInfo
         }
 
         if (intent.getStringExtra("CALLINGACTIVITY") == "SavedLocationsActivity") {
@@ -390,6 +397,26 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
         }
 
+        if (intent.getStringExtra("CALLINGACTIVITY") == "AddLocationActivity") {
+            ll_button_row.visibility = View.INVISIBLE
+            btn_select_location.visibility = View.VISIBLE
+
+        }
+
+        btn_select_location.setOnClickListener {
+            if (markerForAddPlace == null) {
+                Toast.makeText(this,
+                    "Long press on the map to select a location", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent()
+                intent.putExtra("latToSave", latToSave)
+                intent.putExtra("lngToSave", lngToSave)
+                setResult(Activity.RESULT_OK, intent)
+                onBackPressed()
+            }
+
+        }
+
         bsb.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
         ll_location_details.setOnClickListener {
@@ -404,6 +431,11 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
 
         btn_saved_locations.setOnClickListener {
             val intent = Intent(this, SavedLocationsActivity::class.java)
+            startActivity(intent)
+        }
+
+        btn_add_location.setOnClickListener{
+            var intent = Intent(this, AddLocationActivity::class.java)
             startActivity(intent)
         }
 
@@ -569,6 +601,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                 val bottomPadding = hsvHeightInPx + placeNameHeightInPx +
                         openOrCloseHeightInPx + operatingHoursHeightInPx + buttonRowHeightInPx
                 mMap.setPadding(0, searchBarHeightInPx + 60, 0, bottomPadding)
+
             } else {
                 mMap.setPadding(0, searchBarHeightInPx + 60, 0, buttonRowHeightInPx)
             }
@@ -588,6 +621,24 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             val location = LatLng(latitudeOfLocation!!, longitudeOfLocation!!)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f))
             mMap.addMarker(MarkerOptions().position(location))
+        }
+        if (intent.getStringExtra("CALLINGACTIVITY") == "AddLocationActivity") {
+            mMap.setOnMapLongClickListener {
+                if (markerForAddPlace == null) {
+                    markerForAddPlace = mMap.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(it.latitude, it.longitude))
+                    )
+                    latToSave = it.latitude
+                    lngToSave = it.longitude
+                } else {
+                    markerForAddPlace!!.position = LatLng(it.latitude, it.longitude)
+                    latToSave = it.latitude
+                    lngToSave = it.longitude
+                }
+            }
+            latToSave = currentLatitude
+            lngToSave = currentLongitude
         }
 
     }

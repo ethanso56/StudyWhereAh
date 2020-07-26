@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.android.synthetic.main.activity_sign_in_first.*
 import kotlinx.android.synthetic.main.activity_update_profile.*
+import kotlinx.android.synthetic.main.activity_user_profile.*
 
 class UpdateProfileActivity: AppCompatActivity() {
 
@@ -22,6 +23,10 @@ class UpdateProfileActivity: AppCompatActivity() {
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true) //set back button
             actionbar.title = "Update Profile"
+        }
+
+        toolbar_update_profile_activity.setNavigationOnClickListener {
+            onBackPressed()
         }
 
         btn_confirm_profile_updates.setOnClickListener {

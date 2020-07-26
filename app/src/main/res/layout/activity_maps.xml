@@ -16,6 +16,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activities.MapsActivity" />
+
+    <LinearLayout
+        android:id="@+id/btn_select_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:padding="3dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_button_profile"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_margin="2dp"
+            android:background="@drawable/ic_baseline_check_24"/>
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:elevation="2dp"
+            android:text="Select this Spot"/>
+
+    </LinearLayout>
     
     <LinearLayout
         android:id="@+id/ll_button_row"
@@ -33,6 +61,32 @@
 <!--            android:textSize="15dp"-->
 <!--            android:elevation="2dp"-->
 <!--            android:background="@drawable/bg_button_toggle_panel"/>-->
+        <LinearLayout
+            android:id="@+id/btn_add_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="3dp"
+            android:background="@drawable/bg_button_profile">
+
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:layout_margin="2dp"
+                android:background="@drawable/ic_baseline_person_outline_24"/>
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:elevation="2dp"
+                android:text="Add a place"/>
+
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/btn_get_place1"
             android:layout_width="0dp"
@@ -310,7 +364,7 @@
                 />
 
                 <TextView
-                    android:id="@+id/tv_location_detail_navigation_time"
+                    android:id="@+id/tv_location_special_instructions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
@@ -319,10 +373,25 @@
                     android:paddingBottom="8dp"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:drawableLeft="@drawable/ic_navigation_black"
-                    android:text="20min"
+                    android:drawableLeft="@drawable/ic_baseline_emoji_emotions_24"
+                    android:text="Some customised instructions for you :)"
                     android:background="@drawable/bg_slide_up_panel_tvs"
                     />
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tv_location_detail_navigation_time"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textSize="15sp"-->
+<!--                    android:drawablePadding="15dp"-->
+<!--                    android:paddingTop="8dp"-->
+<!--                    android:paddingBottom="8dp"-->
+<!--                    android:paddingLeft="15dp"-->
+<!--                    android:paddingRight="15dp"-->
+<!--                    android:drawableLeft="@drawable/ic_navigation_black"-->
+<!--                    android:text="20min"-->
+<!--                    android:background="@drawable/bg_slide_up_panel_tvs"-->
+<!--                    />-->
 
             </LinearLayout>
 

@@ -32,7 +32,7 @@ class ImageViewsAdapter(data: ArrayList<StorageReference>)
     }
 
     override fun onBindViewHolder(holder: ImageViewsAdapter.ViewHolder, position: Int) {
-        var task = inputArrList.get(position).getBytes(350 * 1000)
+        var task = inputArrList.get(position).getBytes(500 * 1000)
         task.addOnSuccessListener { byteArr ->
             var bitmap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
             holder.imgView.setImageBitmap(bitmap)

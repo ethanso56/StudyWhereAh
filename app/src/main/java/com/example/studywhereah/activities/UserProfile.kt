@@ -162,7 +162,6 @@ class UserProfile: AppCompatActivity() {
                     .createSignInIntentBuilder()
                     .setIsSmartLockEnabled(false)
                     .setLogo(R.drawable.books)
-                    .set
                     .setAvailableProviders(providers)
                     .build(),
                 RC_SIGN_IN)
