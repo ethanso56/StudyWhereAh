@@ -25,6 +25,8 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.activity_add_location_activity.*
 import kotlinx.android.synthetic.main.activity_sign_in_first.*
 import kotlinx.android.synthetic.main.activity_user_profile.*
 import kotlinx.android.synthetic.main.alert_dialog_input_username.*
@@ -35,6 +37,9 @@ class UserProfile: AppCompatActivity() {
     // start AuthUI intent whenever necessary to make exp smoother.
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private var RC_SIGN_IN = 10001
+    private var PICK_IMAGE = 1
+    private var firebaseStorage = FirebaseStorage.getInstance()
+    private var fbsReference = firebaseStorage.reference
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,7 @@ class UserProfile: AppCompatActivity() {
             setContentView(R.layout.activity_sign_in_first)
             setSupportActionBar(toolbar_user_profile_sign_in_first)
             var actionbar = supportActionBar
-            if (actionbar != null) {
+                if (actionbar != null) {
                 actionbar.setDisplayHomeAsUpEnabled(true) //set back button
                 actionbar.title = "Profile"
             }
@@ -67,11 +72,23 @@ class UserProfile: AppCompatActivity() {
                 onBackPressed()
             }
 
+            btn_choose_profile_picture.setOnClickListener {
+                val intent = Intent()
+                intent.type = "image/*"
+                intent.action = Intent.ACTION_GET_CONTENT
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE)
+            }
+
 //            var profilePhotoUrl = currentUser?.photoUrl
 //            var bitmap = getBitmapFromUri(profilePhotoUrl!!)
 //            iv_profile_photo.setImageBitmap(bitmap)
-            // then inside the xml the default value is set to "not avail
-            // use this technique for all other fields in other activities
+            var storageRef =
+                fbsReference.child("Profile Photos/${currentUser!!.email}")
+            storageRef.getBytes(10000 * 1000).addOnSuccessListener {
+                var bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                iv_profile_photo.setImageBitmap(bitmap)
+            }
+
             var profileName = currentUser?.displayName
             Log.d("WHY", (profileName?.length).toString())
             if (profileName?.length != 0) {
@@ -190,6 +207,17 @@ class UserProfile: AppCompatActivity() {
                 } else {
                     // we dk so we log the error
                     Log.e("Error", idpResponse.error?.message)
+                }
+            }
+        } else if (requestCode == PICK_IMAGE) {
+            if (resultCode == Activity.RESULT_OK) {
+                var profilePhotoToUpload = data?.data
+                iv_profile_photo.setImageURI(profilePhotoToUpload)
+                var filePath = fbsReference.child("Profile Photos/${currentUser!!.email}")
+                var uploadTask = filePath.putFile(profilePhotoToUpload!!)
+                Toast.makeText(this, "Profile Photo Selected", Toast.LENGTH_SHORT).show()
+                uploadTask.addOnSuccessListener {
+                    Toast.makeText(this, "Profile Photo Uploaded", Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -119,6 +119,11 @@ class AddLocationActivity: AppCompatActivity() {
                             hasPort!!, hasFood!!, selectedLat!!, selectedLng!!, specialInfo!!
                         )
                         Log.e("WHY", "Both complete")
+                        Tasks.whenAll(imageUploadTask, firestoreTask).addOnSuccessListener {
+                            if (locationSaved!!) {
+                                this.finish()
+                            }
+                        }
                     }
 
                 } else if (checkbox_save_to_device.isChecked) {
@@ -126,6 +131,9 @@ class AddLocationActivity: AppCompatActivity() {
                     saveLocation(
                         placeName!!,"", selectedLat!!, selectedLng!!, -1,
                         arrayListOf(-1, -1), hasFood!!, hasPort!!, ArrayList<Int>())
+                    if (locationSaved!!) {
+                        this.finish()
+                    }
 
                 } else if (checkbox_upload_to_database.isChecked) {
                     if (imageToUpload == null) {
@@ -139,7 +147,12 @@ class AddLocationActivity: AppCompatActivity() {
                         val specialInfo = input_special_info.text.toString()
                         uploadImage()
                         uploadToFirestore(placeName!!, hasPort, hasFood, selectedLat!!, selectedLng!!, specialInfo)
+                        Tasks.whenAll(imageUploadTask, firestoreTask).addOnSuccessListener {
+                            // dont care about location locally saving
+                            this.finish()
+                        }
                     }
+
 
                 } else {
 
@@ -150,13 +163,6 @@ class AddLocationActivity: AppCompatActivity() {
                     ).show()
 
                 }
-
-                Tasks.whenAll(imageUploadTask, firestoreTask).addOnSuccessListener {
-                    if (locationSaved!!) {
-                        this.finish()
-                    }
-                }
-
             }
         }
 

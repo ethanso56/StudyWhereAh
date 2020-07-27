@@ -274,10 +274,9 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
                     btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_black_24dp)
                     saveLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!,
                         phoneNumber!!, operatingHours, hasFood!!, hasPort!!, imagesOfLocation)
-                } //else {
+                } // else {
 //                    btn_save_location.setBackgroundResource(R.drawable.ic_bookmark_border_black_24dp)
 //                    deleteLocation(nameOfLocation!!, addressOfLocation!!, latitudeOfLocation!!, longitudeOfLocation!!)
-//                    saveBtnClicked = false
 //                }
 
             }
@@ -515,7 +514,7 @@ class MapsActivity : FragmentActivity(), GoogleMap.OnMapLoadedCallback, OnMapRea
             //previously this area contained code to set up the swipe up bottomSheet.
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng!!, 15.0f))
-            mMap.addMarker(MarkerOptions().position(placeLatLng!!))
+            markerForAddPlace = mMap.addMarker(MarkerOptions().position(placeLatLng!!))
             //Set address on searchbar_edit_text
             tv_search.text = nameOfLocation
             selectedLatitude = placeLatLng.latitude

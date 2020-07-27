@@ -9,7 +9,9 @@ import android.view.View
 import android.widget.*
 import com.example.studywhereah.R
 import com.example.studywhereah.constants.Constants
+import kotlinx.android.synthetic.main.activity_add_location_activity.*
 import kotlinx.android.synthetic.main.activity_choose_preferences.*
+import kotlinx.android.synthetic.main.activity_sign_in_first.*
 import java.nio.DoubleBuffer
 
 class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -27,6 +29,17 @@ class ChoosePreferencesActivity : AppCompatActivity(), AdapterView.OnItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choose_preferences)
+
+        setSupportActionBar(toolbar_choose_preferences_activity)
+        var actionbar = supportActionBar
+        if (actionbar != null) {
+            actionbar.setDisplayHomeAsUpEnabled(true) //set back button
+            actionbar.title = "Select preferences"
+        }
+
+        toolbar_choose_preferences_activity.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
         currentLatitude = intent.getDoubleExtra(Constants.CURRENTLATITUDE, 0.0)
         currentLongitude = intent.getDoubleExtra(Constants.CURRENTLONGITUDE, 0.0)
