@@ -5,6 +5,7 @@ import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ListResult
+import com.google.firebase.storage.StorageReference
 
 class LocationModel(
     private val name: String,
@@ -35,13 +36,19 @@ class LocationModel(
     }
 
     // helper function to download preview image as a byte array
-    fun getPreviewImage(): Task<ByteArray> {
-        // we use the first image as the preview image, note that the photos in firebase storage
-        // have to be .png format.
-        var queryPath = "$name/$name 1.png"
-        // maybe 330kb is too big for the imageview, watch out for future bugs
-        return storageRef.child(queryPath).getBytes(330 * 1000)
-    }
+//    fun getPreviewImage(): Task<ByteArray> {
+//        // we use the first image as the preview image, note that the photos in firebase storage
+//        // have to be .png format.
+//
+//        var listResultTask = getImagesTask()
+//        var task = listResultTask.addOnSuccessListener { listResult ->
+//            var list = listResult.items
+//            // use the first photo as the preview image
+//            return list.get(0).getBytes(500 * 1000).addOnSuccessListener
+//
+//
+//        }
+//    }
 
     fun getImagesTask() : Task<ListResult> {
         var queryPath = name.toString()

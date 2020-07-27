@@ -166,7 +166,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
         }
 
         if (foodAvail && chargingPorts) {
-            collectionRef.whereEqualTo("fAvail", "Study spot located in a mall")
+            collectionRef
                 .whereEqualTo("cPort", true).get().addOnSuccessListener { documents ->
                     pb_firestore_loading.visibility = View.INVISIBLE
                     tv_firebase_loading_msg.visibility = View.INVISIBLE
@@ -198,6 +198,9 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
+
+                    // remove all locations with no food
+                    locationsList.removeIf { it.getFoodAvailable() == "" }
 
                     //******** Bottom two if chunks CAN BE IMPROVED maybe filter when querying and only add if satisfied.
                     if (maxTravelTime == 0) {
@@ -252,8 +255,8 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     }
                 }
         } else if (foodAvail) {
-            // as "fAvail" is a string more values may exist.
-            collectionRef.whereEqualTo("fAvail", "Study spot located in a mall")
+            // only show places with food options
+            collectionRef
                 .get().addOnSuccessListener { documents ->
                     pb_firestore_loading.visibility = View.INVISIBLE
                     tv_firebase_loading_msg.visibility = View.INVISIBLE
@@ -279,6 +282,8 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                         locationsList.add(lModel)
                     }
                     calculateDistanceAndSetPropertyForAllLocations(locationsList)
+
+                    locationsList.removeIf { it.getFoodAvailable() == "" }
 
                     //CAN BE IMPROVED HAHA
                     if (maxTravelTime == 0) {
@@ -377,7 +382,7 @@ class LocationsRecommendedActivity : AppCompatActivity() {
                     }
                 }
         } else {
-            //return all locations
+            //return all locations since the user has no preference
             collectionRef.get()
                 .addOnSuccessListener { documents ->
                     pb_firestore_loading.visibility = View.INVISIBLE

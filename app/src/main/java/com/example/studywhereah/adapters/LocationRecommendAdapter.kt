@@ -87,14 +87,17 @@ class LocationRecommendAdapter(
         val closeTime = operatingHours[1]
         viewHolder.oHours.setText("• Operating hours: " + openTime +" to " + closeTime)
         //just take the first stored image
-        val PreviewImgTask = lModel.getPreviewImage()
-        PreviewImgTask.addOnSuccessListener { byteArr ->
-            Log.e("Success", "byteArrTaskSuccess")
-            var bitMap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
-            viewHolder.imgView.setImageBitmap(bitMap)
+        val ImagesTask = lModel.getImagesTask()
+        ImagesTask.addOnSuccessListener { listResult ->
+            var list = listResult.items
+            // use the first photo as the preview image
+            list.get(0).getBytes(500 * 1000).addOnSuccessListener { byteArr ->
+                var bitMap = BitmapFactory.decodeByteArray(byteArr, 0, byteArr.size)
+                viewHolder.imgView.setImageBitmap(bitMap)
+                Log.e("IMAGE LOADED FOR", lModel.getName())
+            }
         }
         // the problem is in the drawable object. we need to use a bitmap or byte array.
-        Log.e("Success", "Passed listener as its asynchronou")
 //        viewHolder.title.setOnClickListener(this)
 //        viewHolder.imgView.setTag(position)
 
@@ -114,7 +117,8 @@ class LocationRecommendAdapter(
                 intent.putExtra(Constants.SPECIALINFO, lModel.getSpecialInfo())
                 //Line below is to tell MapsActivity when Mapactivity was launched from locationsRecommendedActivity
                 intent.putExtra("CALLINGACTIVITY", "LocationsRecommendedActivity")
-                mContext.applicationContext.startActivity(intent)
+                context.startActivity(intent)
+//                mContext.applicationContext.startActivity(intent)
             }
         })
 
