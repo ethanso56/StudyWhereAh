@@ -2,13 +2,13 @@
 An android application that helps students find study spots!
 
 
-Motivation
+Motivation-
  
 You are one who takes learning very seriously, furthermore, imagine that there is an assignment due 2359 tonight and you need a place to make it happen. 
 However, things aren’t in your favour. Your neighbour’s dog just couldn’t stop barking, and your home is just too noisy for a good study session. How do you find the best study spot? 
 Where do you go to? How would you know if the nearest McDonald’s is full? What if there was a hidden gem, a café just around the corner? Our app “Study where ah??” is here to help you!
  
-Aim
+Aim-
  
 Our app aims to provide a sleek solution in finding a customised, conducive study spot in Singapore for you. 
 Recommendations are given based on the user’s preferences which include location, crowdedness, dining options and availability of charging ports at the study spot. 
@@ -16,7 +16,7 @@ Logged in Users can input their own newly found study spots and even contribute 
 application gets better in recommending spots as people continue using it..
 
 
-User Stories
+User Stories-
  
 1. 	As a student who cannot study at home, I want to quickly know of the nearest location I can study at.
  
@@ -30,7 +30,7 @@ User Stories
 
 
 
-Scope(features)
+Scope(features)-
 
 Mobile application
  
@@ -47,10 +47,18 @@ The database forms the backbone of our application, enabling a strong pool of in
 Profitability: Some possible means in which our application could be profitable would be the tying in of cafes and fast food chains. For Instance,cafes could subscribe to a boost in their ranking within the recommendations in order to increase off-peak crowd levels. In an ideal scenario where there is a high number of users for our application, cafes and fast food chains can further market their menus and promotions through our application by including such information within each study spot’s details.
  
 
-Tech Stack
+Tech Stack-
  
 Technologies used
 1) Kotlin
 2) Java
 3) Google Maps SDK for Android, Google Places API
 4) Firebase Firestore, Firebase Storage, Firebase Authentication, SQlite
+
+Full report- 
+
+https://docs.google.com/document/d/1qmWMlgtggW47R9cFrJ5qrq1hXkBGSoMYzVCTVqM2Eg8/edit
+
+Demostration video- 
+
+https://drive.google.com/file/d/1c4NaieOeB1UJOmfk1CbHCcG04LWTaAyB/view?usp=sharing
