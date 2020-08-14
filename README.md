@@ -49,13 +49,8 @@ Profitability: Some possible means in which our application could be profitable 
 
 Tech Stack
  
-S/n
 Technologies used
-1
-Kotlin
-2
-Java
-3
-Google Maps SDK for Android, Google Places API
-4
-Firebase Firestore, Firebase Storage, Firebase Authentication, SQlite
+1) Kotlin
+2) Java
+3) Google Maps SDK for Android, Google Places API
+4) Firebase Firestore, Firebase Storage, Firebase Authentication, SQlite
