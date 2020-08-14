@@ -55,6 +55,8 @@ Technologies used
 3) Google Maps SDK for Android, Google Places API
 4) Firebase Firestore, Firebase Storage, Firebase Authentication, SQlite
 
+Please check out the full report and demonstration video for more info!
+
 Full report- 
 
 https://docs.google.com/document/d/1qmWMlgtggW47R9cFrJ5qrq1hXkBGSoMYzVCTVqM2Eg8/edit
